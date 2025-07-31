@@ -24,19 +24,10 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [isMounted, setIsMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const isActive = (path: string) => {
     return pathname === path;
   };
-  
-  if (!isMounted) {
-    return null;
-  }
 
   return (
     <SidebarProvider>

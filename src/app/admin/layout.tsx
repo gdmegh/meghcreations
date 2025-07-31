@@ -7,7 +7,8 @@ import {
   LayoutDashboard,
   Menu,
   Package,
-  Users
+  Users,
+  Settings,
 } from "lucide-react";
 import * as React from 'react';
 
@@ -33,11 +34,12 @@ export default function AdminLayout({
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/products", label: "All Products", icon: Package },
     { href: "/admin/customers", label: "Customers", icon: Users },
+    { href: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
   const isActive = (path: string) => {
-    if (path === "/admin") {
-      return pathname === path;
+    if (path === "/admin" && pathname !== "/admin") {
+      return false;
     }
     return pathname.startsWith(path);
   };

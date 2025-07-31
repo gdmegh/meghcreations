@@ -18,16 +18,16 @@ import { Logo } from "@/components/icons";
 
 export function AdminHeader() {
   return (
-    <header className="flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 -mx-4 md:-mx-8">
-      <div className="flex items-center gap-2 md:hidden">
-        <SidebarTrigger />
+    <header className="flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 sticky top-0 z-50">
+      <div className="flex items-center gap-2">
+        <SidebarTrigger className="md:hidden" />
         <Link href="/" className="flex items-center gap-2">
             <Logo className="h-6 w-6 text-primary" />
             <span className="font-bold font-headline">MeghMarket</span>
         </Link>
       </div>
-      <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-        <form className="ml-auto flex-1 sm:flex-initial">
+      <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4 justify-end">
+        <form className="flex-1 sm:flex-initial max-w-xs">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input

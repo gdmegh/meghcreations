@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, Menu, Settings } from "lucide-react";
+import * as React from 'react';
 
 import {
   SidebarProvider,
@@ -23,10 +24,19 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const isActive = (path: string) => {
     return pathname === path;
   };
+  
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <SidebarProvider>

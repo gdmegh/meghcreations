@@ -1,3 +1,6 @@
+
+"use client";
+
 import {
   Card,
   CardContent
@@ -13,10 +16,20 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { categories } from "@/lib/constants";
+import { getCategories } from "@/services/data.service";
 import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function ProductFilters() {
+  const [categories, setCategories] = useState<string[]>([]);
+  useEffect(() => {
+    async function fetchCategories() {
+      const cats = await getCategories();
+      setCategories(['All', ...cats]);
+    }
+    fetchCategories();
+  }, []);
+
   return (
     <Card>
       <CardContent className="p-4">

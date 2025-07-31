@@ -1,23 +1,24 @@
+
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Star, ShoppingBag } from "lucide-react";
 
-import { products, sellers } from "@/lib/constants";
+import { getSellerById, getProductsBySellerId } from "@/services/data.service";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ProductCard } from "@/components/product/product-card";
 import { Card, CardContent } from "@/components/ui/card";
 
-export default function SellerPage({
+export default async function SellerPage({
   params,
 }: {
   params: { sellerId: string };
 }) {
-  const seller = sellers.find((s) => s.id === params.sellerId);
+  const seller = await getSellerById(params.sellerId);
   if (!seller) {
     notFound();
   }
 
-  const sellerProducts = products.filter((p) => p.sellerId === seller.id);
+  const sellerProducts = await getProductsBySellerId(seller.id);
 
   return (
     <div className="py-12">
@@ -52,9 +53,11 @@ export default function SellerPage({
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {sellerProducts.map((product) => (
-          <ProductCard key={product.id} product={product} seller={seller} />
-        ))}
+        {sellerProducts.map(async (product) => {
+          const seller = await getSellerById(product.sellerId);
+          if (!seller) return null;
+          return <ProductCard key={product.id} product={product} seller={seller} />
+        })}
       </div>
     </div>
   );

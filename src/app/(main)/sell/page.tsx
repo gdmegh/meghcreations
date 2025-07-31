@@ -22,6 +22,9 @@ import { ProductDescriptionGenerator } from "@/components/ai/product-description
 import {
   generateProductDescription
 } from "@/ai/flows/generate-product-description";
+import { getCategories } from "@/services/data.service";
+import { useEffect, useState } from "react";
+import { Combobox } from "@/components/ui/combobox";
 
 const formSchema = z.object({
   productName: z.string().min(2, "Product name is required"),
@@ -33,6 +36,17 @@ const formSchema = z.object({
 });
 
 export default function SellPage() {
+  const [categories, setCategories] = useState<{value: string, label: string}[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const cats = await getCategories();
+      setCategories(cats.map(c => ({ value: c, label: c })));
+    };
+    fetchCategories();
+  }, [])
+
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -81,11 +95,15 @@ export default function SellPage() {
                     control={form.control}
                     name="productCategory"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>Category</FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., UI Kits" {...field} />
-                        </FormControl>
+                        <Combobox
+                          options={categories}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select a category..."
+                          searchPlaceholder="Search categories..."
+                        />
                         <FormMessage />
                       </FormItem>
                     )}

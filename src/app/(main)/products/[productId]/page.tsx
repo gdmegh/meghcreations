@@ -5,9 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Star, CheckCircle, ZoomIn, ZoomOut, Redo, Maximize, X } from "lucide-react";
-import { useState, use } from "react";
+import { useState, use, useEffect } from "react";
+import type { Product, Seller } from "@/lib/constants";
+import { getProductById, getSellerById } from "@/services/data.service";
 
-import { products, sellers } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -23,12 +24,30 @@ import { cn } from "@/lib/utils";
 export default function ProductPage({
   params,
 }: {
-  params: Promise<{ productId:string }>;
+  params: { productId: string };
 }) {
-  const { productId } = use(params);
+  const [product, setProduct] = useState<Product | undefined>(undefined);
+  const [seller, setSeller] = useState<Seller | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [zoom, setZoom] = useState(1);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const product = products.find((p) => p.id === productId);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+        setIsLoading(true);
+        const p = await getProductById(params.productId);
+        if (p) {
+            const s = await getSellerById(p.sellerId);
+            setProduct(p);
+            setSeller(s);
+        }
+        setIsLoading(false);
+    };
+
+    fetchData();
+  }, [params.productId]);
+
 
   const handleZoomIn = () => setZoom((prev) => Math.min(prev * 1.2, 3));
   const handleZoomOut = () => setZoom((prev) => Math.max(prev / 1.2, 0.5));
@@ -40,13 +59,14 @@ export default function ProductPage({
     }
   }
 
+  if (isLoading) {
+    return <div className="py-12 text-center">Loading product...</div>
+  }
 
   if (!product) {
     notFound();
   }
-
-  const seller = sellers.find((s) => s.id === product.sellerId);
-
+  
   if (!seller) {
     notFound();
   }

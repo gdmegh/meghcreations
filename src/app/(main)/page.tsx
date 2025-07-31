@@ -1,9 +1,10 @@
+
 import { ProductCard } from "@/components/product/product-card";
 import { ProductFilters } from "@/components/product/product-filters";
-import { products, sellers } from "@/lib/constants";
+import { getProducts, getSellerById } from "@/services/data.service";
 
-export default function HomePage() {
-  const getSellerById = (id: string) => sellers.find((s) => s.id === id);
+export default async function HomePage() {
+  const products = await getProducts();
 
   return (
     <div>
@@ -21,8 +22,8 @@ export default function HomePage() {
           <ProductFilters />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product) => {
-            const seller = getSellerById(product.sellerId);
+          {products.map(async (product) => {
+            const seller = await getSellerById(product.sellerId);
             if (!seller) return null;
             return (
               <ProductCard

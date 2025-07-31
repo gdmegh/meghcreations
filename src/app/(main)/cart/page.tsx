@@ -1,3 +1,6 @@
+
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Plus, Minus, X } from "lucide-react";
@@ -12,21 +15,50 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { products } from "@/lib/constants";
+import { products as staticProducts } from "@/lib/constants";
+import { useEffect, useState } from "react";
+import type { Product } from "@/lib/constants";
+import { getProductById } from "@/services/data.service";
 
-const cartItems = [
+
+const cartItemsData = [
   { productId: 'prod-1', quantity: 1 },
   { productId: 'prod-2', quantity: 2 },
 ];
 
+
 export default function CartPage() {
+  const [cartItems, setCartItems] = useState<{product: Product, quantity: number}[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      setIsLoading(true);
+      const items = await Promise.all(cartItemsData.map(async (item) => {
+        const product = await getProductById(item.productId);
+        return { product, quantity: item.quantity };
+      }));
+      const filteredItems = items.filter(item => item.product !== undefined) as {product: Product, quantity: number}[];
+      setCartItems(filteredItems);
+      setIsLoading(false);
+    }
+    fetchCartItems();
+  }, [])
+
   const subtotal = cartItems.reduce((acc, item) => {
-    const product = products.find(p => p.id === item.productId);
-    return acc + (product?.price || 0) * item.quantity;
+    return acc + (item.product?.price || 0) * item.quantity;
   }, 0);
 
   const tax = subtotal * 0.1;
   const total = subtotal + tax;
+
+  if (isLoading) {
+    return (
+      <div className="py-12 text-center">
+        <p>Loading your cart...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="py-12">
@@ -44,7 +76,7 @@ export default function CartPage() {
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-4">
             {cartItems.map(item => {
-              const product = products.find(p => p.id === item.productId);
+              const product = item.product;
               if (!product) return null;
 
               return (

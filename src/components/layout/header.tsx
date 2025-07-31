@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import {
   Menu,
@@ -11,6 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/icons";
+import { getSellerById } from "@/services/data.service";
+import {
+  DropdownMenu as Dropdown,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Header() {
   return (
@@ -91,16 +101,9 @@ export function Header() {
   );
 }
 
-import {
-  DropdownMenu as Dropdown,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+async function DropdownMenu() {
+  const seller = await getSellerById("seller-1"); // Assuming a logged in user/seller
 
-function DropdownMenu() {
   return (
     <Dropdown>
       <DropdownMenuTrigger asChild>
@@ -117,7 +120,7 @@ function DropdownMenu() {
                 Admin
             </DropdownMenuItem>
         </Link>
-        <Link href="/seller-1"><DropdownMenuItem>Profile</DropdownMenuItem></Link>
+        {seller && <Link href={`/${seller.id}`}><DropdownMenuItem>Profile</DropdownMenuItem></Link>}
         <Link href="/login"><DropdownMenuItem>Login</DropdownMenuItem></Link>
         <Link href="/signup"><DropdownMenuItem>Sign up</DropdownMenuItem></Link>
         <DropdownMenuSeparator />

@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { Loader2 } from "lucide-react";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 
 import { auth, db } from "@/lib/firebase";
@@ -34,14 +34,19 @@ import { Logo } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "@/components/layout/header";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Separator } from "@/components/ui/separator";
 
 const formSchema = z.object({
   displayName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  confirmPassword: z.string(),
   role: z.enum(["buyer", "seller"], {
     required_error: "You need to select a role.",
   }),
+}).refine(data => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
 });
 
 export default function SignupPage() {
@@ -55,6 +60,7 @@ export default function SignupPage() {
       displayName: "",
       email: "",
       password: "",
+      confirmPassword: "",
       role: "buyer",
     },
   });
@@ -93,6 +99,46 @@ export default function SignupPage() {
       });
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setIsLoading(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check if user already exists in Firestore
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+         await setDoc(userDocRef, {
+            displayName: user.displayName,
+            email: user.email,
+            role: "buyer", // Default role for Google sign-in
+            createdAt: new Date(),
+            profilePictureUrl: user.photoURL || `https://placehold.co/100x100.png`,
+            bio: "",
+        });
+      }
+      
+      toast({
+        title: "Login Successful!",
+        description: "Welcome back.",
+      });
+      router.push("/dashboard");
+
+    } catch (error: any) {
+        console.error("Google Sign-In error:", error);
+        toast({
+            title: "Google Sign-In Failed",
+            description: "Could not sign in with Google. Please try again.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsLoading(false);
     }
   }
 
@@ -154,6 +200,19 @@ export default function SignupPage() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                  <FormField
                   control={form.control}
                   name="role"
@@ -197,6 +256,18 @@ export default function SignupPage() {
                 </Button>
               </form>
             </Form>
+            
+            <div className="relative my-6">
+              <Separator />
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-2 text-center">
+                <span className="bg-background px-2 text-sm text-muted-foreground">OR CONTINUE WITH</span>
+              </div>
+            </div>
+
+            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading}>
+                {isLoading ? <Loader2 className="animate-spin" /> : 'Sign in with Google'}
+            </Button>
+
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
               <Link href="/login" className="underline">

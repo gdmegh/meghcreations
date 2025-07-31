@@ -41,7 +41,7 @@ const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
   confirmPassword: z.string(),
-  role: z.enum(["buyer", "seller"], {
+  role: z.enum(["buyer", "seller", "admin"], {
     required_error: "You need to select a role.",
   }),
 }).refine(data => data.password === data.confirmPassword, {
@@ -241,6 +241,14 @@ export default function SignupPage() {
                               Seller
                             </FormLabel>
                           </FormItem>
+                           <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="admin" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Admin
+                            </FormLabel>
+                          </FormItem>
                         </RadioGroup>
                       </FormControl>
                       <FormMessage />
@@ -280,3 +288,5 @@ export default function SignupPage() {
     </>
   );
 }
+
+    

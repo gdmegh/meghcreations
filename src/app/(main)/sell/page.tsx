@@ -4,6 +4,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,9 +24,13 @@ import { ProductDescriptionGenerator } from "@/components/ai/product-description
 import {
   generateProductDescription
 } from "@/ai/flows/generate-product-description";
-import { getCategories } from "@/services/data.service";
+import { getCategories, addProduct } from "@/services/data.service";
 import { useEffect, useState } from "react";
 import { Combobox } from "@/components/ui/combobox";
+import { useToast } from "@/hooks/use-toast";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, type User } from "firebase/auth";
+import { Loader2, UploadCloud } from "lucide-react";
 
 const formSchema = z.object({
   productName: z.string().min(2, "Product name is required"),
@@ -33,18 +39,33 @@ const formSchema = z.object({
   targetAudience: z.string().min(3, "Describe the target audience"),
   price: z.coerce.number().min(0, "Price must be a positive number"),
   description: z.string().min(20, "Description must be at least 20 characters"),
+  previewImage: z.any().refine(file => file instanceof File, "Image is required."),
 });
 
 export default function SellPage() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
   const [categories, setCategories] = useState<{value: string, label: string}[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
       const cats = await getCategories();
-      setCategories(cats.map(c => ({ value: c, label: c })));
+      setCategories(cats.map(c => ({ value: c.id, label: c.name })));
     };
     fetchCategories();
-  }, [])
+
+     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        router.push("/login"); // Redirect to login if not authenticated
+      }
+    });
+    return () => unsubscribe();
+  }, [router])
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,12 +77,56 @@ export default function SellPage() {
       targetAudience: "",
       price: 0.0,
       description: "",
+      previewImage: null,
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // Handle form submission logic
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      form.setValue("previewImage", file, { shouldValidate: true });
+    }
+  };
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user) {
+        toast({ title: "Authentication Error", description: "You must be logged in to create a product.", variant: "destructive" });
+        return;
+    }
+    setIsLoading(true);
+
+    try {
+        await addProduct({
+            title: values.productName,
+            categoryId: values.productCategory,
+            tags: values.keyFeatures.split(',').map(f => f.trim()),
+            price: values.price,
+            description: values.description,
+            priceType: values.price > 0 ? 'fixed' : 'free',
+            assetType: 'Digital Asset', // Placeholder
+            creatorId: user.uid,
+            previewImageFile: values.previewImage,
+        });
+        toast({
+            title: "Product Listed!",
+            description: "Your product has been successfully listed on the marketplace."
+        });
+        router.push("/dashboard");
+    } catch(error) {
+        console.error("Failed to add product", error);
+        toast({
+            title: "Submission Failed",
+            description: "There was an error listing your product. Please try again.",
+            variant: "destructive"
+        })
+    } finally {
+        setIsLoading(false);
+    }
   }
 
   return (
@@ -204,20 +269,41 @@ export default function SellPage() {
                 </CardContent>
               </Card>
               <Card>
-                <CardHeader>
+                 <CardHeader>
                   <CardTitle>Product Image</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="w-full h-40 border-2 border-dashed rounded-lg flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground">Drag & drop or</p>
-                      <Button type="button" variant="link" className="p-0 h-auto">browse files</Button>
-                    </div>
-                  </div>
+                   <FormField
+                    control={form.control}
+                    name="previewImage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="w-full h-48 border-2 border-dashed rounded-lg flex items-center justify-center text-center relative">
+                            {previewImage ? (
+                              <Image src={previewImage} alt="Preview" fill className="object-cover rounded-lg" />
+                            ) : (
+                              <div className="flex flex-col items-center">
+                                <UploadCloud className="w-12 h-12 text-muted-foreground" />
+                                <p className="text-sm text-muted-foreground mt-2">Drag & drop or click to upload</p>
+                              </div>
+                            )}
+                            <Input 
+                              type="file" 
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                              accept="image/*"
+                              onChange={handleFileChange}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </CardContent>
               </Card>
-              <Button type="submit" size="lg" className="w-full">
-                List Product
+              <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+                {isLoading ? <><Loader2 className="animate-spin" /> Listing...</> : "List Product"}
               </Button>
             </div>
           </div>

@@ -4,7 +4,7 @@
 
 import type { DigitalAsset, Seller, Category, User } from "@/lib/constants";
 import { db } from "@/lib/firebase";
-import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where, addDoc } from "firebase/firestore";
 
 // Adding a delay to simulate network latency
 const simulateNetworkDelay = (ms: number) => new Promise(res => setTimeout(res, ms));
@@ -16,6 +16,34 @@ let mockCategories: Category[] = [
     { id: 'cat-3', name: 'Website Templates', createdAt: new Date() },
     { id: 'cat-4', name: 'Landing Pages', parentId: 'cat-3', createdAt: new Date() },
 ];
+
+export async function addProduct(productData: Omit<DigitalAsset, 'id' | 'createdAt' | 'creatorId' | 'isPublished' | 'previewImageUrl' | 'fileUrl'> & { creatorId: string, previewImageFile?: File }): Promise<DigitalAsset> {
+    await simulateNetworkDelay(100);
+    // In a real app, you would upload the file to storage (e.g., Firebase Storage)
+    // and get a URL back. For now, we'll use a placeholder.
+    const previewImageUrl = productData.previewImageFile 
+        ? URL.createObjectURL(productData.previewImageFile) 
+        : `https://placehold.co/600x400.png`;
+
+    const newProductData = {
+        ...productData,
+        isPublished: true, // Default to published for now
+        createdAt: new Date(),
+        previewImageUrl,
+        fileUrl: "mock/file.zip", // Placeholder
+    };
+    
+    // Remove the file object before saving to Firestore
+    delete newProductData.previewImageFile;
+
+    const docRef = await addDoc(collection(db, "digital_assets"), newProductData);
+    
+    return {
+        id: docRef.id,
+        ...newProductData,
+    };
+}
+
 
 export async function getSellers(): Promise<Seller[]> {
     await simulateNetworkDelay(50);
@@ -51,8 +79,20 @@ export async function getUserById(id: string): Promise<User | undefined> {
 
 export async function getSellerById(id: string): Promise<Seller | undefined> {
     const user = await getUserById(id);
-    if (user && user.role === 'seller') {
+    if (user && (user.role === 'seller' || user.role === 'admin')) {
         return user as Seller;
+    }
+    // Fallback for demo purposes if user is not found or not a seller
+    if (!user) {
+        try {
+            const defaultSellerRef = doc(db, 'users', 'seller-1');
+            const defaultSellerSnap = await getDoc(defaultSellerRef);
+            if (defaultSellerSnap.exists()) {
+                return { id: defaultSellerSnap.id, ...defaultSellerSnap.data()} as Seller;
+            }
+        } catch (e) {
+            // ignore
+        }
     }
     return undefined;
 }

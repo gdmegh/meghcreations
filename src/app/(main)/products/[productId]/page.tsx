@@ -1,5 +1,5 @@
 
-import { getProductById, getSellerById } from "@/services/data.service";
+import { getProductById, getSellerById, getCategoryById } from "@/services/data.service";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ProductDetailClient } from "@/components/product/product-detail-client";
@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `MeghMarket | ${product.name}`,
-    description: product.shortDescription,
+    title: `MeghMarket | ${product.title}`,
+    description: product.description,
   };
 }
 
@@ -30,11 +30,13 @@ export default async function ProductPage({ params }: Props) {
     notFound();
   }
 
-  const seller = await getSellerById(product.sellerId);
+  const seller = await getSellerById(product.creatorId);
 
   if (!seller) {
     notFound();
   }
 
-  return <ProductDetailClient product={product} seller={seller} />;
+  const category = await getCategoryById(product.categoryId);
+
+  return <ProductDetailClient product={product} seller={seller} category={category} />;
 }

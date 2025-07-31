@@ -13,10 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getSellers } from "@/services/data.service";
+import { getSellers } from "@/services/data.service"; // Note: Using getSellers as a stand-in for buyers
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
-import type { Seller } from "@/lib/constants";
+import type { User } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import {
@@ -32,10 +32,11 @@ import { AddUserDialog } from "@/components/admin/add-user-dialog";
 
 
 export default function AdminBuyersPage() {
-  const [users, setUsers] = useState<Seller[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // NOTE: This currently fetches sellers. In a real app, you would fetch buyers.
+  // NOTE: This currently fetches sellers and treats them as generic users.
+  // In a real app, you would fetch users with the 'buyer' role.
   useEffect(() => {
     async function loadUsers() {
       setIsLoading(true);
@@ -82,16 +83,16 @@ export default function AdminBuyersPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="person face" />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={user.profilePictureUrl} alt={user.displayName} data-ai-hint="person face" />
+                        <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <span className="font-medium">{user.name}</span>
+                      <span className="font-medium">{user.displayName}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge>Active</Badge>
                   </TableCell>
-                  <TableCell>$ {user.totalSales * 5.5}</TableCell>
+                  <TableCell>$ {Math.floor(Math.random() * 1000)}.00</TableCell>
                   <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

@@ -19,13 +19,14 @@ import { Label } from "@/components/ui/label";
 import { getCategories } from "@/services/data.service";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { Category } from "@/lib/constants";
 
 export function ProductFilters() {
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   useEffect(() => {
     async function fetchCategories() {
       const cats = await getCategories();
-      setCategories(['All', ...cats]);
+      setCategories([{id: 'all', name: 'All Categories', createdAt: new Date()}, ...cats]);
     }
     fetchCategories();
   }, []);
@@ -45,8 +46,8 @@ export function ProductFilters() {
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category) => (
-                  <SelectItem key={category} value={category.toLowerCase()}>
-                    {category}
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>

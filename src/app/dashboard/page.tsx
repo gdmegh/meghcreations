@@ -1,5 +1,4 @@
 
-
 import Link from "next/link";
 import { ArrowUpRight, DollarSign, Package } from "lucide-react";
 import Image from "next/image";
@@ -28,7 +27,7 @@ export default async function SellerDashboardPage() {
     const seller = await getSellerById(sellerId);
     const products = await getProductsBySellerId(sellerId);
 
-    const totalRevenue = products.reduce((acc, product) => acc + product.price, 0);
+    const totalRevenue = products.reduce((acc, product) => acc + (product.price || 0), 0);
 
     return (
         <div className="flex flex-1 flex-col gap-4">
@@ -102,19 +101,19 @@ export default async function SellerDashboardPage() {
                                     alt="Product image"
                                     className="aspect-square rounded-md object-cover"
                                     height="64"
-                                    src={product.imageUrl}
+                                    src={product.previewImageUrl}
                                     width="64"
                                     data-ai-hint="digital product thumbnail"
                                 />
                                 </TableCell>
                                 <TableCell className="font-medium">
-                                {product.name}
+                                {product.title}
                                 </TableCell>
                                 <TableCell>
-                                <Badge variant="outline">Active</Badge>
+                                <Badge variant={product.isPublished ? "outline" : "secondary"}>{product.isPublished ? 'Active' : 'Draft'}</Badge>
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
-                                ${product.price.toFixed(2)}
+                                {product.price ? `$${product.price.toFixed(2)}`: 'Free'}
                                 </TableCell>
                                 <TableCell>
                                     <Button asChild variant="outline" size="sm">

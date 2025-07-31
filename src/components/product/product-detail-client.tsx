@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Star, CheckCircle, ZoomIn, ZoomOut, Redo, Maximize, X } from "lucide-react";
 import { useState } from "react";
-import type { Product, Seller } from "@/lib/constants";
+import type { DigitalAsset, Seller, Category } from "@/lib/constants";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,11 +20,12 @@ import {
 import { cn } from "@/lib/utils";
 
 interface ProductDetailClientProps {
-    product: Product;
+    product: DigitalAsset;
     seller: Seller;
+    category?: Category;
 }
 
-export function ProductDetailClient({ product, seller }: ProductDetailClientProps) {
+export function ProductDetailClient({ product, seller, category }: ProductDetailClientProps) {
   const [zoom, setZoom] = useState(1);
   const [isFullScreen, setIsFullScreen] = useState(false);
   
@@ -72,8 +73,8 @@ export function ProductDetailClient({ product, seller }: ProductDetailClientProp
                       }}
                     >
                       <Image
-                        src={product.imageUrl}
-                        alt={product.name}
+                        src={product.previewImageUrl}
+                        alt={product.title}
                         width={isFullScreen ? 1920 : 1200}
                         height={isFullScreen ? 1080 : 1800}
                         className={cn("object-contain", { "object-top": !isFullScreen })}
@@ -106,22 +107,22 @@ export function ProductDetailClient({ product, seller }: ProductDetailClientProp
 
           <div className={cn("md:col-span-1 flex-col gap-6", isFullScreen ? "hidden" : "flex")}>
             <div>
-              <Badge variant="secondary">{product.category}</Badge>
+              <Badge variant="secondary">{category?.name || product.assetType}</Badge>
               <h1 className="text-4xl font-bold font-headline mt-2">
-                {product.name}
+                {product.title}
               </h1>
               <div className="mt-4 flex items-center gap-4">
                 <Link href={`/${seller.id}`} className="flex items-center gap-2 group">
                   <Avatar>
-                    <AvatarImage src={seller.avatarUrl} alt={seller.name} data-ai-hint="person face" />
-                    <AvatarFallback>{seller.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={seller.profilePictureUrl} alt={seller.displayName} data-ai-hint="person face" />
+                    <AvatarFallback>{seller.displayName.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <span className="font-medium group-hover:underline">{seller.name}</span>
+                  <span className="font-medium group-hover:underline">{seller.displayName}</span>
                 </Link>
                 <div className="flex items-center gap-1 text-yellow-500">
                   <Star className="w-4 h-4 fill-current" />
-                  <span>{seller.rating.toFixed(1)}</span>
-                  <span className="text-muted-foreground">({seller.totalSales} sales)</span>
+                  <span>{seller.rating?.toFixed(1) || 'N/A'}</span>
+                  <span className="text-muted-foreground">({seller.totalSales || 0} sales)</span>
                 </div>
               </div>
             </div>
@@ -130,25 +131,27 @@ export function ProductDetailClient({ product, seller }: ProductDetailClientProp
               {product.description}
             </p>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Key Features</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {product.features.map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+            {product.tags && product.tags.length > 0 && (
+                <Card>
+                <CardHeader>
+                    <CardTitle>Key Features</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ul className="space-y-2">
+                    {product.tags.map((feature, index) => (
+                        <li key={index} className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-primary" />
+                        <span>{feature}</span>
+                        </li>
+                    ))}
+                    </ul>
+                </CardContent>
+                </Card>
+            )}
 
             <div className="flex flex-col sm:items-center sm:justify-between gap-4 sticky bottom-8">
               <div className="text-4xl font-bold font-headline text-primary">
-                ${product.price.toFixed(2)}
+                {product.price ? `$${product.price.toFixed(2)}` : 'Free'}
               </div>
               <Button size="lg" className="w-full">
                 Add to Cart
@@ -160,4 +163,3 @@ export function ProductDetailClient({ product, seller }: ProductDetailClientProp
     </div>
   );
 }
-

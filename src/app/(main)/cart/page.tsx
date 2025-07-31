@@ -15,9 +15,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { products as staticProducts } from "@/lib/constants";
 import { useEffect, useState } from "react";
-import type { Product } from "@/lib/constants";
+import type { DigitalAsset } from "@/lib/constants";
 import { getProductById } from "@/services/data.service";
 
 
@@ -28,7 +27,7 @@ const cartItemsData = [
 
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<{product: Product, quantity: number}[]>([]);
+  const [cartItems, setCartItems] = useState<{product: DigitalAsset, quantity: number}[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -38,7 +37,7 @@ export default function CartPage() {
         const product = await getProductById(item.productId);
         return { product, quantity: item.quantity };
       }));
-      const filteredItems = items.filter(item => item.product !== undefined) as {product: Product, quantity: number}[];
+      const filteredItems = items.filter(item => item.product !== undefined) as {product: DigitalAsset, quantity: number}[];
       setCartItems(filteredItems);
       setIsLoading(false);
     }
@@ -81,11 +80,11 @@ export default function CartPage() {
 
               return (
                 <Card key={product.id} className="flex items-center p-4">
-                  <Image src={product.imageUrl} alt={product.name} width={100} height={100} className="rounded-md object-cover" data-ai-hint="digital product thumbnail"/>
+                  <Image src={product.previewImageUrl} alt={product.title} width={100} height={100} className="rounded-md object-cover" data-ai-hint="digital product thumbnail"/>
                   <div className="ml-4 flex-grow">
-                    <h3 className="font-semibold">{product.name}</h3>
-                    <p className="text-sm text-muted-foreground">{product.category}</p>
-                    <p className="text-lg font-semibold mt-1">${product.price.toFixed(2)}</p>
+                    <h3 className="font-semibold">{product.title}</h3>
+                    <p className="text-sm text-muted-foreground">{product.assetType}</p>
+                    <p className="text-lg font-semibold mt-1">${product.price?.toFixed(2)}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="icon" className="h-8 w-8"><Minus className="h-4 w-4" /></Button>

@@ -27,19 +27,19 @@ export default async function SellerPage({
         <CardContent className="p-6 pt-0">
           <div className="flex items-end -mt-16">
             <Avatar className="w-32 h-32 border-4 border-background">
-              <AvatarImage src={seller.avatarUrl} alt={seller.name} data-ai-hint="person face" />
-              <AvatarFallback className="text-4xl">{seller.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={seller.profilePictureUrl} alt={seller.displayName} data-ai-hint="person face" />
+              <AvatarFallback className="text-4xl">{seller.displayName.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="ml-6 mb-2">
-              <h1 className="text-3xl font-bold font-headline">{seller.name}</h1>
+              <h1 className="text-3xl font-bold font-headline">{seller.displayName}</h1>
               <div className="flex items-center gap-4 text-muted-foreground mt-1">
                 <div className="flex items-center gap-1 text-yellow-500">
                   <Star className="w-4 h-4 fill-current" />
-                  <span>{seller.rating.toFixed(1)}</span>
+                  <span>{seller.rating?.toFixed(1) || 'N/A'}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <ShoppingBag className="w-4 h-4" />
-                  <span>{seller.totalSales} sales</span>
+                  <span>{seller.totalSales || 0} sales</span>
                 </div>
               </div>
             </div>
@@ -49,13 +49,12 @@ export default async function SellerPage({
       </Card>
 
       <h2 className="text-2xl font-bold font-headline mb-6">
-        Products by {seller.name}
+        Products by {seller.displayName}
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {sellerProducts.map(async (product) => {
-          const seller = await getSellerById(product.sellerId);
-          if (!seller) return null;
+          // The seller is already fetched, so we pass it directly.
           return <ProductCard key={product.id} product={product} seller={seller} />
         })}
       </div>

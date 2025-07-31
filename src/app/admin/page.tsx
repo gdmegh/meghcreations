@@ -22,7 +22,7 @@ export default async function AdminDashboardPage() {
   const sellers = await getSellers();
 
   const totalRevenue = products.reduce(
-    (acc, product) => acc + product.price,
+    (acc, product) => acc + (product.price || 0),
     0
   );
   const totalProducts = products.length;
@@ -87,12 +87,12 @@ export default async function AdminDashboardPage() {
             </TableHeader>
             <TableBody>
                 {products.slice(0, 5).map(async (product) => {
-                    const seller = await getSellers().then(sellers => sellers.find(s => s.id === product.sellerId));
+                    const seller = await getSellers().then(sellers => sellers.find(s => s.id === product.creatorId));
                     return (
                         <TableRow key={product.id}>
-                            <TableCell className="font-medium">{product.name}</TableCell>
-                            <TableCell>{seller?.name || 'Unknown'}</TableCell>
-                            <TableCell className="hidden md:table-cell">${product.price.toFixed(2)}</TableCell>
+                            <TableCell className="font-medium">{product.title}</TableCell>
+                            <TableCell>{seller?.displayName || 'Unknown'}</TableCell>
+                            <TableCell className="hidden md:table-cell">${product.price?.toFixed(2) || 'Free'}</TableCell>
                         </TableRow>
                     )
                 })}

@@ -81,16 +81,16 @@ export default function AdminSellersPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="person face" />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={user.profilePictureUrl} alt={user.displayName} data-ai-hint="person face" />
+                        <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <span className="font-medium">{user.name}</span>
+                      <span className="font-medium">{user.displayName}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge>Active</Badge>
                   </TableCell>
-                  <TableCell>{user.totalSales}</TableCell>
+                  <TableCell>{user.totalSales || 0}</TableCell>
                   <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

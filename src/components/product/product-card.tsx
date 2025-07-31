@@ -8,11 +8,11 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { Product, Seller } from "@/lib/constants";
+import type { DigitalAsset, Seller } from "@/lib/constants";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ProductCardProps {
-  product: Product;
+  product: DigitalAsset;
   seller: Seller;
 }
 
@@ -23,8 +23,8 @@ export function ProductCard({ product, seller }: ProductCardProps) {
         <CardHeader className="p-0">
           <div className="relative h-52 w-full">
             <Image
-              src={product.imageUrl}
-              alt={product.name}
+              src={product.previewImageUrl}
+              alt={product.title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               data-ai-hint="digital product screenshot"
@@ -33,22 +33,22 @@ export function ProductCard({ product, seller }: ProductCardProps) {
         </CardHeader>
         <CardContent className="p-4 flex-grow">
           <div className="flex items-start justify-between">
-            <Badge variant="secondary">{product.category}</Badge>
+            <Badge variant="secondary">{product.assetType}</Badge>
             <div className="text-lg font-bold font-headline text-primary">
-              ${product.price.toFixed(2)}
+              ${product.price?.toFixed(2) || 'Free'}
             </div>
           </div>
           <h3 className="mt-3 text-lg font-semibold font-headline leading-tight group-hover:text-primary transition-colors">
-            {product.name}
+            {product.title}
           </h3>
         </CardContent>
         <CardFooter className="p-4 pt-0">
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border-2 border-background">
-              <AvatarImage src={seller.avatarUrl} alt={seller.name} data-ai-hint="person face" />
-              <AvatarFallback>{seller.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={seller.profilePictureUrl} alt={seller.displayName} data-ai-hint="person face" />
+              <AvatarFallback>{seller.displayName.charAt(0)}</AvatarFallback>
             </Avatar>
-            <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{seller.name}</span>
+            <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{seller.displayName}</span>
           </div>
         </CardFooter>
       </Card>

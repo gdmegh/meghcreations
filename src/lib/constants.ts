@@ -1,33 +1,59 @@
 
-export type Product = {
+
+// Base User, which can be a buyer or a seller
+export type User = {
   id: string;
-  name: string;
-  category: string;
-  price: number;
-  sellerId: string;
-  description: string;
-  shortDescription: string;
-  imageUrl: string;
-  features: string[];
-  reviews: {
-    user: string;
-    rating: number;
-    comment: string;
-  }[];
+  username: string;
+  email: string;
+  createdAt: Date;
+  role: 'buyer' | 'seller' | 'admin';
+  displayName: string;
+  profilePictureUrl: string;
+  bio?: string;
 };
 
-export type Seller = {
+// This extends User, for when we know the user is a seller
+// and might have seller-specific properties.
+export type Seller = User & {
+    role: 'seller';
+    rating?: number; // Calculated field
+    totalSales?: number; // Calculated field
+};
+
+export type Category = {
   id: string;
   name: string;
-  avatarUrl: string;
-  bio: string;
+  createdAt: Date;
+  description?: string;
+};
+
+export type DigitalAsset = {
+  id: string;
+  title: string;
+  priceType: 'free' | 'fixed';
+  price?: number;
+  fileUrl: string;
+  assetType: string; // e.g., 'UI Kit', 'Icon Set', 'eBook'
+  creatorId: string;
+  categoryId: string;
+  createdAt: Date;
+  isPublished: boolean;
+  description?: string;
+  tags?: string[];
+  previewImageUrl: string;
+  displayImageUrls?: string[];
+  reviews?: Review[];
+};
+
+export type Review = {
+  id: string;
+  assetId: string;
+  reviewerId: string;
   rating: number;
-  totalSales: number;
+  createdAt: Date;
+  comment?: string;
+  updatedAt?: Date;
 };
-
-// This file is now primarily for type definitions.
-// The data has been moved to src/services/data.service.ts
-// to simulate a dynamic data fetching architecture.
 
 // IMPORTANT: Now that authentication is set up, you must configure
 // Firestore Security Rules in the Firebase console. This is crucial
@@ -36,6 +62,6 @@ export type Seller = {
 // You can start with rules that allow public reads but restrict
 // writes to authenticated users who own the content.
 
-export const products: Product[] = [];
+export const products: DigitalAsset[] = [];
 export const sellers: Seller[] = [];
-export const categories: string[] = [];
+export const categories: Category[] = [];

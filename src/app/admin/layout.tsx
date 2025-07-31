@@ -12,6 +12,7 @@ import {
   ChevronDown,
   User,
   ShoppingBag,
+  CreditCard,
 } from "lucide-react";
 import * as React from 'react';
 
@@ -40,6 +41,7 @@ export default function AdminLayout({
     { href: "/admin/products", label: "All Products", icon: Package },
     { href: "/admin/sellers", label: "Sellers", icon: User },
     { href: "/admin/buyers", label: "Buyers", icon: ShoppingBag },
+    { href: "/admin/payments", label: "Payments", icon: CreditCard },
     { 
       label: "Settings", 
       icon: Settings,
@@ -51,17 +53,15 @@ export default function AdminLayout({
     },
   ];
 
-  const isActive = (path: string) => {
+  const isActive = (path: string, exact: boolean = false) => {
     if (!path) return false;
-    // Special case for dashboard to avoid matching all admin routes
-    if (path === "/admin") return pathname === "/admin";
-    if (path === "/admin/settings") return pathname === "/admin/settings";
+    if (exact) return pathname === path;
     return pathname.startsWith(path);
   };
   
   const NavLink = ({ item }: { item: any }) => {
     if (item.children) {
-      const isParentActive = item.children.some((child: any) => isActive(child.href));
+      const isParentActive = item.children.some((child: any) => isActive(child.href, child.href === '/admin/settings'));
       return (
         <Collapsible defaultOpen={isParentActive}>
           <CollapsibleTrigger className="w-full">
@@ -84,7 +84,7 @@ export default function AdminLayout({
                   href={child.href}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                    isActive(child.href) && "bg-muted text-primary font-bold"
+                    isActive(child.href, child.href === '/admin/settings') && "bg-muted text-primary font-bold"
                   )}
                 >
                   {child.label}
@@ -101,7 +101,7 @@ export default function AdminLayout({
         href={item.href}
         className={cn(
           "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-          isActive(item.href) && "bg-muted text-primary font-bold"
+          isActive(item.href, item.href === '/admin') && "bg-muted text-primary font-bold"
         )}
       >
         <item.icon className="h-4 w-4" />
@@ -125,7 +125,7 @@ export default function AdminLayout({
                   href={child.href}
                   className={cn(
                     "rounded-md px-3 py-2 text-muted-foreground hover:text-foreground",
-                     isActive(child.href) && "bg-muted text-foreground"
+                     isActive(child.href, child.href === '/admin/settings') && "bg-muted text-foreground"
                   )}
                 >
                   {child.label}
@@ -141,7 +141,7 @@ export default function AdminLayout({
           href={item.href}
           className={cn(
             "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
-            isActive(item.href) && "bg-muted text-foreground"
+            isActive(item.href, item.href === '/admin') && "bg-muted text-foreground"
           )}
         >
             <item.icon className="h-5 w-5" />

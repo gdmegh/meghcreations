@@ -31,12 +31,6 @@ export default function AdminLayout({
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/portfolio", label: "Portfolio", icon: Briefcase },
-    { href: "/admin/services", label: "Services", icon: Handshake },
-    { href: "/admin/blog", label: "Blog", icon: Newspaper },
-    { href: "/admin/news", label: "News", icon: Newspaper },
-    { href: "/admin/events", label: "Events", icon: Calendar },
-    { href: "/admin/testimonials", label: "Testimonials", icon: MessageSquareQuote },
   ];
 
   const isActive = (path: string) => {

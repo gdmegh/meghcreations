@@ -85,9 +85,11 @@ export default function AdminLayout({
           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
-            <AdminHeader />
             <main className="p-4 md:p-8">
-                {children}
+                <AdminHeader />
+                <div className="mt-8">
+                    {children}
+                </div>
             </main>
         </SidebarInset>
       </div>

@@ -16,7 +16,7 @@ export default function HomePage() {
         </p>
       </section>
 
-      <main className="container px-4 md:px-8 py-8">
+      <main className="px-4 md:px-8 py-8">
         <div className="mb-8">
           <ProductFilters />
         </div>

@@ -25,6 +25,7 @@ export type Category = {
   name: string;
   createdAt: Date;
   description?: string;
+  parentId?: string;
 };
 
 export type DigitalAsset = {

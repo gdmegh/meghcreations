@@ -26,6 +26,12 @@ export default function AdminCategoriesPage() {
     loadCategories();
   }, []);
 
+  const getParentCategoryName = (parentId?: string) => {
+    if (!parentId) return 'N/A';
+    const parent = categories.find(c => c.id === parentId);
+    return parent ? parent.name : 'Unknown';
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -43,7 +49,7 @@ export default function AdminCategoriesPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
+                <TableHead>Parent Category</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
@@ -59,8 +65,8 @@ export default function AdminCategoriesPage() {
               ) : categories.map((category) => (
                 <TableRow key={category.id}>
                   <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell className="text-muted-foreground max-w-sm truncate">
-                    {category.description || 'No description'}
+                  <TableCell className="text-muted-foreground">
+                    {getParentCategoryName(category.parentId)}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

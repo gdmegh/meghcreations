@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,21 +19,44 @@ import { useEffect, useState } from "react"
 import type { Category } from "@/lib/constants"
 import { getCategories } from "@/services/data.service"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useToast } from "@/hooks/use-toast"
 
 export function AddCategoryDialog() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [parentId, setParentId] = useState<string | undefined>(undefined);
+  const { toast } = useToast();
+
 
   useEffect(() => {
-    async function loadCategories() {
-      const fetchedCategories = await getCategories();
-      setCategories(fetchedCategories);
+    if (open) {
+        async function loadCategories() {
+            const fetchedCategories = await getCategories();
+            setCategories(fetchedCategories);
+        }
+        loadCategories();
     }
-    loadCategories();
-  }, []);
+  }, [open]);
 
-  // In a real app, you'd handle form state and submission here
+  const handleSave = () => {
+    // In a real app, you would call a server function to save the new category to Firestore.
+    // For now, we'll just log it and show a toast.
+    console.log("Saving new category:", { name, parentId });
+    
+    toast({
+        title: "Category Saved!",
+        description: `The category "${name}" has been created.`,
+    });
+
+    // Reset state and close dialog
+    setName("");
+    setParentId(undefined);
+    setOpen(false);
+  }
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
             <PlusCircle className="mr-2 h-4 w-4"/>
@@ -51,13 +75,19 @@ export function AddCategoryDialog() {
             <Label htmlFor="name" className="text-right">
               Name
             </Label>
-            <Input id="name" placeholder="e.g. UI Kits" className="col-span-3" />
+            <Input 
+              id="name" 
+              placeholder="e.g. UI Kits" 
+              className="col-span-3" 
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="parent" className="text-right">
               Parent
             </Label>
-            <Select>
+            <Select onValueChange={setParentId} value={parentId}>
               <SelectTrigger id="parent" className="col-span-3">
                 <SelectValue placeholder="Select a parent (optional)" />
               </SelectTrigger>
@@ -73,7 +103,10 @@ export function AddCategoryDialog() {
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit">Save Category</Button>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button onClick={handleSave} disabled={!name}>Save Category</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

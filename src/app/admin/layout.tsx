@@ -14,7 +14,6 @@ import {
   SidebarMenuButton,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { Logo } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { AdminHeader } from "@/components/admin/admin-header";
 

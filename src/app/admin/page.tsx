@@ -1,4 +1,4 @@
-// src/app/(admin)/admin/page.tsx
+
 import {
   Card,
   CardContent,

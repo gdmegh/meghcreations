@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Star, CheckCircle, ZoomIn, ZoomOut, Redo } from "lucide-react";
-import { useState } from "react";
+import { useState, use } from "react";
 
 import { products, sellers } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -23,10 +23,11 @@ import { cn } from "@/lib/utils";
 export default function ProductPage({
   params,
 }: {
-  params: { productId: string };
+  params: Promise<{ productId: string }>;
 }) {
+  const { productId } = use(params);
   const [zoom, setZoom] = useState(1);
-  const product = products.find((p) => p.id === params.productId);
+  const product = products.find((p) => p.id === productId);
   
   const handleZoomIn = () => setZoom((prev) => Math.min(prev * 1.2, 3));
   const handleZoomOut = () => setZoom((prev) => Math.max(prev / 1.2, 0.5));

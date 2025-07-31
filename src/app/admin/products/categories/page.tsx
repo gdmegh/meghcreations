@@ -146,7 +146,7 @@ export default function AdminCategoriesPage() {
               </Select>
             </div>
             <Button type="submit" disabled={isAdding || !newCategoryName}>
-              {isAdding ? <><Loader2 className="animate-spin" /> Adding...</> : "Add Category"}
+              {isAdding ? <><Loader2 className="animate-spin mr-2" /> Adding...</> : "Add Category"}
             </Button>
           </form>
         </CardContent>

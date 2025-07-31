@@ -30,6 +30,7 @@ export function Footer() {
           </p>
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <Link href="/admin">Admin</Link>
             <Link href="#">Terms of Service</Link>
             <Link href="#">Privacy Policy</Link>
         </div>

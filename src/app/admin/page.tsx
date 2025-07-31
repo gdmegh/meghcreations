@@ -9,24 +9,15 @@ import {
 
 export default function AdminDashboardPage() {
   return (
-    <div className="p-4 md:p-8">
-      <h1 className="text-3xl font-bold font-headline mb-6">Dashboard</h1>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome, Admin!</CardTitle>
-            <CardDescription>
-              Here's a quick overview of your marketplace.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p>
-              You can manage your site settings, mega menu, and more from the
-              sidebar.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-center rounded-lg border border-dashed shadow-sm">
+        <div className="flex flex-col items-center gap-1 text-center p-8">
+          <h1 className="text-2xl font-bold tracking-tight">
+            Welcome to your Dashboard
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            You can manage your site from here. Select a menu item to get started.
+          </p>
+        </div>
       </div>
-    </div>
   );
 }

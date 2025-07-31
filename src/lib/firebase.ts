@@ -1,3 +1,4 @@
+
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApp, getApps } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
@@ -7,13 +8,13 @@ import { getFirestore } from "firebase/firestore";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-  measurementId: "YOUR_MEASUREMENT_ID"
+  apiKey: "AIzaSyDqHCGYsDZrMLTp9Xig5sMMdnWI_f-TCUk",
+  authDomain: "meghcreations-98639.firebaseapp.com",
+  projectId: "meghcreations-98639",
+  storageBucket: "meghcreations-98639.appspot.com",
+  messagingSenderId: "528168904684",
+  appId: "1:528168904684:web:3fe8fed94f30324661c2c9",
+  measurementId: "G-X6W6H01190"
 };
 
 // Initialize Firebase

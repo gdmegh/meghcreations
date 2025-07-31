@@ -14,60 +14,68 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { PlusCircle } from "lucide-react"
 import { useEffect, useState } from "react"
 import type { Category } from "@/lib/constants"
 import { getCategories } from "@/services/data.service"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
-export function AddCategoryDialog() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [open, setOpen] = useState(false);
+interface AddCategoryDialogProps {
+  children?: React.ReactNode;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  category?: Category;
+  onFinished?: () => void;
+}
+
+export function AddCategoryDialog({ children, isOpen, setIsOpen, category, onFinished }: AddCategoryDialogProps) {
+  const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [name, setName] = useState("");
   const [parentId, setParentId] = useState<string | undefined>(undefined);
   const { toast } = useToast();
 
-
   useEffect(() => {
-    if (open) {
+    if (isOpen) {
         async function loadCategories() {
             const fetchedCategories = await getCategories();
-            setCategories(fetchedCategories);
+            // Exclude the current category from the list of potential parents
+            setAllCategories(fetchedCategories.filter(c => c.id !== category?.id));
         }
         loadCategories();
+
+        if (category) {
+          setName(category.name);
+          setParentId(category.parentId);
+        } else {
+          setName("");
+          setParentId(undefined);
+        }
     }
-  }, [open]);
+  }, [isOpen, category]);
 
   const handleSave = () => {
-    // In a real app, you would call a server function to save the new category to Firestore.
-    // For now, we'll just log it and show a toast.
-    console.log("Saving new category:", { name, parentId });
+    const action = category ? "Updating" : "Saving";
+    const verb = category ? "Updated" : "Created";
+    
+    console.log(`${action} category:`, { id: category?.id, name, parentId });
     
     toast({
-        title: "Category Saved!",
-        description: `The category "${name}" has been created.`,
+        title: `Category ${verb}!`,
+        description: `The category "${name}" has been successfully ${verb.toLowerCase()}.`,
     });
-
-    // Reset state and close dialog
-    setName("");
-    setParentId(undefined);
-    setOpen(false);
+    
+    if(onFinished) onFinished();
+    setIsOpen(false);
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-            <PlusCircle className="mr-2 h-4 w-4"/>
-            Add Category
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {children && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Category</DialogTitle>
+          <DialogTitle>{category ? 'Edit Category' : 'Add New Category'}</DialogTitle>
           <DialogDescription>
-            Create a new product category. Click save when you're done.
+            {category ? 'Update the category details.' : 'Create a new product category.'} Click save when you're done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -87,15 +95,15 @@ export function AddCategoryDialog() {
             <Label htmlFor="parent" className="text-right">
               Parent
             </Label>
-            <Select onValueChange={setParentId} value={parentId}>
+            <Select onValueChange={(value) => setParentId(value === 'none' ? undefined : value)} value={parentId || 'none'}>
               <SelectTrigger id="parent" className="col-span-3">
                 <SelectValue placeholder="Select a parent (optional)" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">No Parent</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
+                {allCategories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.name}
                   </SelectItem>
                 ))}
               </SelectContent>

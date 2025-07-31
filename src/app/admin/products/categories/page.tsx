@@ -7,24 +7,61 @@ import type { Category } from "@/lib/constants";
 import { getCategories } from "@/services/data.service";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AddCategoryDialog } from "@/components/admin/add-category-dialog";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAddEditDialogOpen, setIsAddEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
+  const { toast } = useToast();
+
+
+  const loadCategories = async () => {
+    setIsLoading(true);
+    const fetchedCategories = await getCategories();
+    setCategories(fetchedCategories);
+    setIsLoading(false);
+  }
 
   useEffect(() => {
-    async function loadCategories() {
-      setIsLoading(true);
-      const fetchedCategories = await getCategories();
-      setCategories(fetchedCategories);
-      setIsLoading(false);
-    }
     loadCategories();
   }, []);
+  
+  const handleAdd = () => {
+    setSelectedCategory(undefined);
+    setIsAddEditDialogOpen(true);
+  }
+
+  const handleEdit = (category: Category) => {
+    setSelectedCategory(category);
+    setIsAddEditDialogOpen(true);
+  }
+  
+  const handleDelete = (category: Category) => {
+    setSelectedCategory(category);
+    setIsDeleteDialogOpen(true);
+  }
+
+  const onConfirmDelete = () => {
+    if (!selectedCategory) return;
+    // Backend logic to delete would go here.
+    console.log("Deleting category:", selectedCategory);
+    toast({
+      title: "Category Deleted",
+      description: `The category "${selectedCategory.name}" has been deleted.`,
+    });
+    setIsDeleteDialogOpen(false);
+    setSelectedCategory(undefined);
+    // You would re-fetch categories here
+    loadCategories(); 
+  }
 
   const getParentCategoryName = (parentId?: string) => {
     if (!parentId) return 'N/A';
@@ -41,7 +78,14 @@ export default function AdminCategoriesPage() {
             A list of all product categories on the platform.
           </p>
         </div>
-        <AddCategoryDialog />
+        <AddCategoryDialog 
+          isOpen={isAddEditDialogOpen}
+          setIsOpen={setIsAddEditDialogOpen}
+          category={selectedCategory}
+          onFinished={loadCategories}
+        >
+          <Button onClick={handleAdd}>Add Category</Button>
+        </AddCategoryDialog>
       </div>
       <Card>
         <CardContent className="pt-6">
@@ -82,8 +126,8 @@ export default function AdminCategoriesPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Delete</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEdit(category)}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDelete(category)}>Delete</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -93,6 +137,13 @@ export default function AdminCategoriesPage() {
           </Table>
         </CardContent>
       </Card>
+      <ConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={onConfirmDelete}
+        title="Are you sure?"
+        description={`This will permanently delete the category "${selectedCategory?.name}". This action cannot be undone.`}
+      />
     </div>
   );
 }

@@ -1,7 +1,11 @@
+
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Star, CheckCircle } from "lucide-react";
+import { Star, CheckCircle, ZoomIn, ZoomOut, Redo } from "lucide-react";
+import { useState } from "react";
 
 import { products, sellers } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -14,12 +18,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export default function ProductPage({
   params,
 }: {
   params: { productId: string };
 }) {
+  const [zoom, setZoom] = useState(1);
   const product = products.find((p) => p.id === params.productId);
   if (!product) {
     notFound();
@@ -30,23 +36,59 @@ export default function ProductPage({
     notFound();
   }
 
+  const handleZoomIn = () => setZoom((prev) => Math.min(prev * 1.2, 3));
+  const handleZoomOut = () => setZoom((prev) => Math.max(prev / 1.2, 0.5));
+  const handleResetZoom = () => setZoom(1);
+
   return (
     <div className="container py-12">
-      <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-        <div className="flex-shrink-0">
-          <div className="relative w-full h-[400px] rounded-lg overflow-hidden shadow-lg">
-            <Image
-              src={product.imageUrl}
-              alt={product.name}
-              fill
-              className="object-cover"
-              data-ai-hint="digital product screenshot"
-            />
+      <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+        <div className="md:col-span-2">
+          <div className="sticky top-20">
+            <Card>
+              <CardContent className="p-2">
+                <div
+                  className="relative w-full overflow-auto rounded-lg shadow-lg"
+                  style={{ height: "calc(100vh - 10rem)" }}
+                >
+                  <div
+                    className="relative transition-transform duration-300"
+                    style={{
+                      transform: `scale(${zoom})`,
+                      transformOrigin: "top center",
+                      width: "100%",
+                    }}
+                  >
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.name}
+                      width={1200}
+                      height={1800}
+                      className="object-contain object-top"
+                      data-ai-hint="digital product screenshot"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <div className="flex justify-center items-center gap-2 mt-4">
+                <Button variant="outline" size="icon" onClick={handleZoomOut}>
+                    <ZoomOut />
+                    <span className="sr-only">Zoom Out</span>
+                </Button>
+                <Button variant="outline" size="icon" onClick={handleResetZoom}>
+                    <Redo />
+                    <span className="sr-only">Reset Zoom</span>
+                </Button>
+                <Button variant="outline" size="icon" onClick={handleZoomIn}>
+                    <ZoomIn />
+                    <span className="sr-only">Zoom In</span>
+                </Button>
+            </div>
           </div>
-          {/* Add Carousel for multiple images here if needed */}
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="md:col-span-1 flex flex-col gap-6">
           <div>
             <Badge variant="secondary">{product.category}</Badge>
             <h1 className="text-4xl font-bold font-headline mt-2">
@@ -88,11 +130,11 @@ export default function ProductPage({
             </CardContent>
           </Card>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:items-center sm:justify-between gap-4 sticky bottom-8">
             <div className="text-4xl font-bold font-headline text-primary">
               ${product.price.toFixed(2)}
             </div>
-            <Button size="lg" className="w-full sm:w-auto">
+            <Button size="lg" className="w-full">
               Add to Cart
             </Button>
           </div>

@@ -28,7 +28,13 @@ export type Seller = {
 // This file is now primarily for type definitions.
 // The data has been moved to src/services/data.service.ts
 // to simulate a dynamic data fetching architecture.
-// You can replace the mock data in the service with your actual database calls.
+
+// IMPORTANT: Now that authentication is set up, you must configure
+// Firestore Security Rules in the Firebase console. This is crucial
+// to protect your data and ensure only authorized users can perform
+// actions like creating or editing products.
+// You can start with rules that allow public reads but restrict
+// writes to authenticated users who own the content.
 
 export const products: Product[] = [];
 export const sellers: Seller[] = [];

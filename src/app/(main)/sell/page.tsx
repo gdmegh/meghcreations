@@ -71,18 +71,6 @@ export default function SellPage() {
     },
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      form.setValue("previewImage", file, { shouldValidate: true });
-    }
-  };
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user) {
         toast({ title: "Authentication Error", description: "You must be logged in to create a product.", variant: "destructive" });
@@ -256,7 +244,17 @@ export default function SellPage() {
                               type="file" 
                               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                               accept="image/*"
-                              onChange={handleFileChange}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => {
+                                    setPreviewImage(reader.result as string);
+                                  };
+                                  reader.readAsDataURL(file);
+                                  field.onChange(file);
+                                }
+                              }}
                             />
                           </div>
                         </FormControl>
@@ -303,5 +301,3 @@ export default function SellPage() {
     </div>
   );
 }
-
-    

@@ -9,15 +9,19 @@ import {
   UserCircle,
   LayoutDashboard,
   Package,
+  LogOut,
+  LogIn,
+  UserPlus
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { onAuthStateChanged, signOut, type User } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/icons";
-import { getSellerById } from "@/services/data.service";
-import type { Seller } from "@/lib/constants";
+import { auth } from "@/lib/firebase";
 import {
   DropdownMenu as Dropdown,
   DropdownMenuContent,
@@ -27,6 +31,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
+import { getSellerById } from "@/services/data.service";
+import type { Seller } from "@/lib/constants";
 
 export function Header() {
   return (
@@ -108,16 +115,49 @@ export function Header() {
 }
 
 function UserDropdown() {
+  const [user, setUser] = useState<User | null>(null);
   const [seller, setSeller] = useState<Seller | undefined>(undefined);
+  const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchSeller = async () => {
-      // Hardcoded for now, in a real app you'd get the current user
-      const currentSeller = await getSellerById("seller-1");
-      setSeller(currentSeller);
-    };
-    fetchSeller();
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        // Assuming a mapping between Firebase UID and your seller ID.
+        // This is a placeholder; you might have a 'users' collection
+        // where you store the role and can check if the user is a seller.
+        const currentSeller = await getSellerById(currentUser.uid);
+        if (currentSeller) {
+          setSeller(currentSeller);
+        } else {
+           // For now, let's use a default seller profile for any logged in user
+           const defaultSeller = await getSellerById("seller-1");
+           setSeller(defaultSeller);
+        }
+      } else {
+        setSeller(undefined);
+      }
+    });
+    return () => unsubscribe();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+      });
+      router.push("/login");
+    } catch (error) {
+      toast({
+        title: "Logout Failed",
+        description: "An error occurred during logout. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Dropdown>
@@ -127,45 +167,62 @@ function UserDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>
+          {user ? `Logged in as ${user.email}` : "My Account"}
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <Link href="/dashboard">
-            <DropdownMenuItem>
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              <span>Dashboard</span>
+        {user ? (
+          <>
+            <DropdownMenuGroup>
+              <Link href="/dashboard">
+                <DropdownMenuItem>
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
+                </DropdownMenuItem>
+              </Link>
+              {seller && (
+                <Link href={`/${seller.id}`}>
+                  <DropdownMenuItem>
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    <span>Public Profile</span>
+                  </DropdownMenuItem>
+                </Link>
+              )}
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                Site Management
+              </DropdownMenuLabel>
+              <Link href="/admin">
+                <DropdownMenuItem>
+                  <Package className="mr-2 h-4 w-4" />
+                  <span>Admin Panel</span>
+                </DropdownMenuItem>
+              </Link>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Logout</span>
             </DropdownMenuItem>
-          </Link>
-          {seller && (
-            <Link href={`/${seller.id}`}>
+          </>
+        ) : (
+          <>
+            <Link href="/login">
               <DropdownMenuItem>
-                <UserCircle className="mr-2 h-4 w-4" />
-                <span>Public Profile</span>
+                <LogIn className="mr-2 h-4 w-4" />
+                <span>Login</span>
               </DropdownMenuItem>
             </Link>
-          )}
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className="text-xs text-muted-foreground">
-            Site Management
-          </DropdownMenuLabel>
-          <Link href="/admin">
-            <DropdownMenuItem>
-              <Package className="mr-2 h-4 w-4" />
-              <span>Admin Panel</span>
-            </DropdownMenuItem>
-          </Link>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <Link href="/login">
-          <DropdownMenuItem>Login</DropdownMenuItem>
-        </Link>
-        <Link href="/signup">
-          <DropdownMenuItem>Sign up</DropdownMenuItem>
-        </Link>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>Logout</DropdownMenuItem>
+            <Link href="/signup">
+              <DropdownMenuItem>
+                <UserPlus className="mr-2 h-4 w-4" />
+                <span>Sign up</span>
+              </DropdownMenuItem>
+            </Link>
+          </>
+        )}
       </DropdownMenuContent>
     </Dropdown>
   );

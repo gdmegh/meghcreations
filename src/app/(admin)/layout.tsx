@@ -33,7 +33,7 @@ export default function AdminLayout({
     <SidebarProvider>
       <div className="flex flex-col min-h-screen bg-background">
         <AdminHeader />
-        <div className="flex flex-1 mt-4">
+        <div className="flex flex-1">
             <Sidebar collapsible="none">
             <SidebarContent>
                 <SidebarMenu>
@@ -78,7 +78,7 @@ export default function AdminLayout({
                 </Button>
             </SidebarFooter>
             </Sidebar>
-            <main className="flex-1 p-4 md:p-8">
+            <main className="flex-1">
                 {children}
             </main>
         </div>

@@ -29,7 +29,7 @@ export default function CartPage() {
   const total = subtotal + tax;
 
   return (
-    <div className="container py-12">
+    <div className="container py-12 px-4 md:px-8">
       <h1 className="text-4xl font-bold font-headline mb-8">Your Cart</h1>
       
       {cartItems.length === 0 ? (

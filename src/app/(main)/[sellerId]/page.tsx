@@ -20,7 +20,7 @@ export default function SellerPage({
   const sellerProducts = products.filter((p) => p.sellerId === seller.id);
 
   return (
-    <div className="container py-12">
+    <div className="container py-12 px-4 md:px-8">
       <Card className="mb-12 overflow-hidden">
         <div className="bg-muted h-32" />
         <CardContent className="p-6 pt-0">

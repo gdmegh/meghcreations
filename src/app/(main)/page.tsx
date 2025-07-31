@@ -6,8 +6,8 @@ export default function HomePage() {
   const getSellerById = (id: string) => sellers.find((s) => s.id === id);
 
   return (
-    <div className="container py-8">
-      <section className="text-center mb-12">
+    <div>
+      <section className="text-center py-12 px-4 md:px-8">
         <h1 className="text-4xl md:text-5xl font-bold font-headline">
           Discover Your Next Digital Asset
         </h1>
@@ -16,7 +16,7 @@ export default function HomePage() {
         </p>
       </section>
 
-      <main>
+      <main className="container px-4 md:px-8 py-8">
         <div className="mb-8">
           <ProductFilters />
         </div>

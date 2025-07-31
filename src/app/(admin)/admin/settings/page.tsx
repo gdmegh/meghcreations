@@ -10,7 +10,7 @@ import { LogoUploader } from "@/components/admin/logo-uploader";
 
 export default function AdminSettingsPage() {
   return (
-    <div>
+    <div className="p-4 md:p-8">
       <h1 className="text-3xl font-bold font-headline mb-6">Settings</h1>
       <Card>
         <CardHeader>

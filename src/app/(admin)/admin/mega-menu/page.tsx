@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 
 export default function MegaMenuPage() {
   return (
-    <div>
+    <div className="p-4 md:p-8">
       <h1 className="text-3xl font-bold font-headline mb-6">Mega Menu Setup</h1>
       <Card>
         <CardHeader>

@@ -107,7 +107,7 @@ const sellersData: Seller[] = [
   ];
 
 // Adding a delay to simulate network latency
-const " + "`" + `simulateNetworkDelay` + "`" + ` = (ms: number) => new Promise(res => setTimeout(res, ms));
+const simulateNetworkDelay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 export async function getSellers(): Promise<Seller[]> {
     await simulateNetworkDelay(50);

@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Loader2, Trash2 } from "lucide-react";
 import type { Category } from "@/lib/constants";
 import { getCategories, deleteCategory, addCategory } from "@/services/data.service";
 
@@ -15,7 +15,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);

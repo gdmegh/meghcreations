@@ -33,10 +33,14 @@ export default function ProductPage({
   const [zoom, setZoom] = useState(1);
   const [isFullScreen, setIsFullScreen] = useState(false);
   
+  // The `use` hook is disabled in this environment.
+  // Using the productId directly from params.
+  const productId = params.productId;
+
   useEffect(() => {
     const fetchData = async () => {
         setIsLoading(true);
-        const p = await getProductById(params.productId);
+        const p = await getProductById(productId);
         if (p) {
             const s = await getSellerById(p.sellerId);
             setProduct(p);
@@ -46,7 +50,7 @@ export default function ProductPage({
     };
 
     fetchData();
-  }, [params.productId]);
+  }, [productId]);
 
 
   const handleZoomIn = () => setZoom((prev) => Math.min(prev * 1.2, 3));

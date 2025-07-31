@@ -16,29 +16,24 @@ export default function HomePage() {
         </p>
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <aside className="lg:col-span-1">
-          <div className="sticky top-20">
-            <ProductFilters />
-          </div>
-        </aside>
-
-        <main className="lg:col-span-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-            {products.map((product) => {
-              const seller = getSellerById(product.sellerId);
-              if (!seller) return null;
-              return (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  seller={seller}
-                />
-              );
-            })}
-          </div>
-        </main>
-      </div>
+      <main>
+        <div className="mb-8">
+          <ProductFilters />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+          {products.map((product) => {
+            const seller = getSellerById(product.sellerId);
+            if (!seller) return null;
+            return (
+              <ProductCard
+                key={product.id}
+                product={product}
+                seller={seller}
+              />
+            );
+          })}
+        </div>
+      </main>
     </div>
   );
 }

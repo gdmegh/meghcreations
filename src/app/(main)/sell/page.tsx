@@ -1,9 +1,9 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import "server-only";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,8 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductDescriptionGenerator } from "@/components/ai/product-description-generator";
 import {
-  generateProductDescription,
-  type GenerateProductDescriptionInput,
+  generateProductDescription
 } from "@/ai/flows/generate-product-description";
 
 const formSchema = z.object({
@@ -32,13 +31,6 @@ const formSchema = z.object({
   price: z.coerce.number().min(0, "Price must be a positive number"),
   description: z.string().min(20, "Description must be at least 20 characters"),
 });
-
-async function generateDescriptionAction(
-  input: GenerateProductDescriptionInput
-) {
-  "use server";
-  return await generateProductDescription(input);
-}
 
 export default function SellPage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -101,7 +93,7 @@ export default function SellPage() {
                   <div className="flex items-center justify-between">
                     <FormLabel>Description</FormLabel>
                     <ProductDescriptionGenerator
-                      generateDescriptionAction={generateDescriptionAction}
+                      generateDescriptionAction={generateProductDescription}
                       form={form}
                     />
                   </div>

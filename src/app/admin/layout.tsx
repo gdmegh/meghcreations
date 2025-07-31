@@ -33,13 +33,16 @@ export default function AdminLayout({
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/products", label: "All Products", icon: Package },
-    { href: "/admin/customers", label: "Customers", icon: Users },
+    { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
   const isActive = (path: string) => {
     if (path === "/admin" && pathname !== "/admin") {
       return false;
+    }
+    if (path === "/admin/users" && pathname.startsWith("/admin/customers")) {
+      return true;
     }
     return pathname.startsWith(path);
   };

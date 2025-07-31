@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Menu,
+  Package,
+  Users
 } from "lucide-react";
 import * as React from 'react';
 
@@ -29,6 +31,8 @@ export default function AdminLayout({
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin/products", label: "Products", icon: Package },
+    { href: "/admin/customers", label: "Customers", icon: Users },
   ];
 
   const isActive = (path: string) => {

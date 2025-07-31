@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -16,6 +17,12 @@ export default {
       },
     },
     extend: {
+      backgroundImage: {
+        'grid-pattern': "linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px)",
+      },
+      backgroundSize: {
+        'grid-pattern': '2rem 2rem',
+      },
       fontFamily: {
         body: ['Inter', 'sans-serif'],
         headline: ['Space Grotesk', 'sans-serif'],

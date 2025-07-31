@@ -6,6 +6,7 @@ import {
   ShoppingCart,
   UserCircle,
   LayoutDashboard,
+  Package,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 
 export function Header() {
@@ -111,16 +113,36 @@ async function DropdownMenu() {
           <UserCircle className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <Link href="/admin">
+        <DropdownMenuGroup>
+          <Link href="/dashboard">
             <DropdownMenuItem>
-                <LayoutDashboard className="mr-2"/>
-                Admin
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              <span>Dashboard</span>
             </DropdownMenuItem>
-        </Link>
-        {seller && <Link href={`/${seller.id}`}><DropdownMenuItem>Profile</DropdownMenuItem></Link>}
+          </Link>
+          {seller && 
+            <Link href={`/${seller.id}`}>
+              <DropdownMenuItem>
+                <UserCircle className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+            </Link>
+          }
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="text-xs text-muted-foreground">Seller</DropdownMenuLabel>
+          <Link href="/admin">
+            <DropdownMenuItem>
+                <Package className="mr-2 h-4 w-4"/>
+                <span>Seller Dashboard</span>
+            </DropdownMenuItem>
+          </Link>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
         <Link href="/login"><DropdownMenuItem>Login</DropdownMenuItem></Link>
         <Link href="/signup"><DropdownMenuItem>Sign up</DropdownMenuItem></Link>
         <DropdownMenuSeparator />

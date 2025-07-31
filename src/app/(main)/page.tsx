@@ -7,7 +7,7 @@ export default function HomePage() {
 
   return (
     <div>
-      <section className="text-center py-12 px-4 md:px-8">
+      <section className="text-center py-12">
         <h1 className="text-4xl md:text-5xl font-bold font-headline">
           Discover Your Next Digital Asset
         </h1>
@@ -16,7 +16,7 @@ export default function HomePage() {
         </p>
       </section>
 
-      <main className="px-4 md:px-8 py-8">
+      <main className="py-8">
         <div className="mb-8">
           <ProductFilters />
         </div>

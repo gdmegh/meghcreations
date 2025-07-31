@@ -44,7 +44,7 @@ export default function ProductPage({
   }
 
   return (
-    <div className="py-12 px-4 md:px-8">
+    <div className="py-12">
       <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
         <div className="md:col-span-2">
           <div className="sticky top-20">

@@ -27,18 +27,20 @@ export default function ProductPage({
 }) {
   const [zoom, setZoom] = useState(1);
   const product = products.find((p) => p.id === params.productId);
+  
+  const handleZoomIn = () => setZoom((prev) => Math.min(prev * 1.2, 3));
+  const handleZoomOut = () => setZoom((prev) => Math.max(prev / 1.2, 0.5));
+  const handleResetZoom = () => setZoom(1);
+
   if (!product) {
     notFound();
   }
 
   const seller = sellers.find((s) => s.id === product.sellerId);
+  
   if (!seller) {
     notFound();
   }
-
-  const handleZoomIn = () => setZoom((prev) => Math.min(prev * 1.2, 3));
-  const handleZoomOut = () => setZoom((prev) => Math.max(prev / 1.2, 0.5));
-  const handleResetZoom = () => setZoom(1);
 
   return (
     <div className="container py-12">

@@ -1,4 +1,6 @@
 
+"use client";
+
 import Link from "next/link";
 import {
   Menu,
@@ -8,12 +10,14 @@ import {
   LayoutDashboard,
   Package,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/icons";
 import { getSellerById } from "@/services/data.service";
+import type { Seller } from "@/lib/constants";
 import {
   DropdownMenu as Dropdown,
   DropdownMenuContent,
@@ -95,7 +99,7 @@ export function Header() {
                 <ShoppingCart className="h-5 w-5" />
               </Button>
             </Link>
-            <DropdownMenu />
+            <UserDropdown />
           </nav>
         </div>
       </div>
@@ -103,8 +107,17 @@ export function Header() {
   );
 }
 
-async function DropdownMenu() {
-  const seller = await getSellerById("seller-1"); // Assuming a logged in user/seller
+function UserDropdown() {
+  const [seller, setSeller] = useState<Seller | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchSeller = async () => {
+      // Hardcoded for now, in a real app you'd get the current user
+      const currentSeller = await getSellerById("seller-1");
+      setSeller(currentSeller);
+    };
+    fetchSeller();
+  }, []);
 
   return (
     <Dropdown>
@@ -123,31 +136,37 @@ async function DropdownMenu() {
               <span>Dashboard</span>
             </DropdownMenuItem>
           </Link>
-          {seller && 
+          {seller && (
             <Link href={`/${seller.id}`}>
               <DropdownMenuItem>
                 <UserCircle className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
             </Link>
-          }
+          )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="text-xs text-muted-foreground">Seller</DropdownMenuLabel>
+          <DropdownMenuLabel className="text-xs text-muted-foreground">
+            Seller
+          </DropdownMenuLabel>
           <Link href="/admin">
             <DropdownMenuItem>
-                <Package className="mr-2 h-4 w-4"/>
-                <span>Seller Dashboard</span>
+              <Package className="mr-2 h-4 w-4" />
+              <span>Seller Dashboard</span>
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <Link href="/login"><DropdownMenuItem>Login</DropdownMenuItem></Link>
-        <Link href="/signup"><DropdownMenuItem>Sign up</DropdownMenuItem></Link>
+        <Link href="/login">
+          <DropdownMenuItem>Login</DropdownMenuItem>
+        </Link>
+        <Link href="/signup">
+          <DropdownMenuItem>Sign up</DropdownMenuItem>
+        </Link>
         <DropdownMenuSeparator />
         <DropdownMenuItem>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </Dropdown>
-  )
+  );
 }

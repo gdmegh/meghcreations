@@ -4,6 +4,7 @@ import {
   Search,
   ShoppingCart,
   UserCircle,
+  LayoutDashboard,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -110,6 +111,12 @@ function DropdownMenu() {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <Link href="/admin">
+            <DropdownMenuItem>
+                <LayoutDashboard className="mr-2"/>
+                Admin
+            </DropdownMenuItem>
+        </Link>
         <Link href="/seller-1"><DropdownMenuItem>Profile</DropdownMenuItem></Link>
         <Link href="/login"><DropdownMenuItem>Login</DropdownMenuItem></Link>
         <Link href="/signup"><DropdownMenuItem>Sign up</DropdownMenuItem></Link>

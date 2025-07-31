@@ -9,20 +9,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 
 export default function AdminSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold font-headline">Admin Settings</h1>
+        <h1 className="text-2xl font-bold font-headline">General Settings</h1>
         <p className="text-muted-foreground">
           Manage your marketplace settings and configurations.
         </p>
@@ -49,37 +42,6 @@ export default function AdminSettingsPage() {
                 </div>
                  <Button variant="outline" type="button">Upload New Logo</Button>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>User Role Management</CardTitle>
-          <CardDescription>
-            Assign roles and permissions to users. This is a placeholder UI.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-end gap-4">
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="user-email">User Email</Label>
-              <Input id="user-email" type="email" placeholder="user@example.com" />
-            </div>
-            <div className="grid w-full max-w-xs items-center gap-1.5">
-              <Label htmlFor="role">Role</Label>
-              <Select>
-                <SelectTrigger id="role">
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="seller">Seller</SelectItem>
-                  <SelectItem value="customer">Customer</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button>Assign Role</Button>
           </div>
         </CardContent>
       </Card>
@@ -115,3 +77,4 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+

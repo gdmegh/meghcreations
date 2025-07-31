@@ -10,6 +10,8 @@ import {
   Users,
   Settings,
   ChevronDown,
+  User,
+  ShoppingBag,
 } from "lucide-react";
 import * as React from 'react';
 
@@ -36,22 +38,24 @@ export default function AdminLayout({
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/products", label: "All Products", icon: Package },
+    { href: "/admin/sellers", label: "Sellers", icon: User },
+    { href: "/admin/buyers", label: "Buyers", icon: ShoppingBag },
     { 
-      label: "User Management", 
-      icon: Users,
+      label: "Settings", 
+      icon: Settings,
       children: [
-        { href: "/admin/users", label: "All Users" },
-        { href: "/admin/users/roles", label: "Roles" },
-        { href: "/admin/users/permissions", label: "Permissions" },
+        { href: "/admin/settings", label: "General" },
+        { href: "/admin/settings/roles", label: "Roles" },
+        { href: "/admin/settings/permissions", label: "Permissions" },
       ]
     },
-    { href: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
   const isActive = (path: string) => {
     if (!path) return false;
     // Special case for dashboard to avoid matching all admin routes
     if (path === "/admin") return pathname === "/admin";
+    if (path === "/admin/settings") return pathname === "/admin/settings";
     return pathname.startsWith(path);
   };
   

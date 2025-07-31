@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, type User as FirebaseUser } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 
@@ -35,6 +35,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Header } from "@/components/layout/header";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import type { User } from "@/lib/constants";
 
 const formSchema = z.object({
   displayName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
@@ -64,6 +65,41 @@ export default function SignupPage() {
       role: "buyer",
     },
   });
+
+  const handleLoginSuccess = async (firebaseUser: FirebaseUser) => {
+    const userDocRef = doc(db, 'users', firebaseUser.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+      const user = userDoc.data() as User;
+      toast({
+        title: "Login Successful!",
+        description: "Welcome back.",
+      });
+      
+      // Role-based redirect
+      if (user.role === 'admin') {
+        router.push("/admin");
+      } else if (user.role === 'seller') {
+        router.push("/dashboard");
+      } else {
+        router.push("/");
+      }
+    } else {
+      // This should only happen for a brand new Google Sign-in
+       await setDoc(userDocRef, {
+          displayName: firebaseUser.displayName,
+          email: firebaseUser.email,
+          role: "buyer", // Default role for Google sign-in
+          createdAt: new Date(),
+          profilePictureUrl: firebaseUser.photoURL || `https://placehold.co/100x100.png`,
+          bio: "",
+      });
+      toast({ title: "Account Created!", description: "Welcome to MeghMarket." });
+      router.push("/"); // New users go to the homepage
+    }
+  }
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -107,29 +143,7 @@ export default function SignupPage() {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      // Check if user already exists in Firestore
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (!userDoc.exists()) {
-         await setDoc(userDocRef, {
-            displayName: user.displayName,
-            email: user.email,
-            role: "buyer", // Default role for Google sign-in
-            createdAt: new Date(),
-            profilePictureUrl: user.photoURL || `https://placehold.co/100x100.png`,
-            bio: "",
-        });
-      }
-      
-      toast({
-        title: "Login Successful!",
-        description: "Welcome back.",
-      });
-      router.push("/dashboard");
-
+      await handleLoginSuccess(result.user);
     } catch (error: any) {
         console.error("Google Sign-In error:", error);
         toast({
@@ -280,5 +294,3 @@ export default function SignupPage() {
     </>
   );
 }
-
-    

@@ -7,10 +7,11 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, type User as FirebaseUser } from "firebase/auth";
 import { Loader2 } from "lucide-react";
+import { doc, getDoc } from "firebase/firestore";
 
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -31,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "@/components/layout/header";
+import type { User } from "@/lib/constants";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
@@ -51,15 +53,37 @@ export default function LoginPage() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+  const handleLoginSuccess = async (firebaseUser: FirebaseUser) => {
+    const userDocRef = doc(db, 'users', firebaseUser.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+      const user = userDoc.data() as User;
       toast({
         title: "Login Successful!",
         description: "Welcome back.",
       });
-      router.push("/dashboard");
+      
+      // Role-based redirect
+      if (user.role === 'admin') {
+        router.push("/admin");
+      } else if (user.role === 'seller') {
+        router.push("/dashboard");
+      } else {
+        router.push("/");
+      }
+    } else {
+      // This case should ideally not happen if signup is working correctly
+      toast({ title: "User data not found.", variant: "destructive" });
+      router.push("/");
+    }
+  }
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+      await handleLoginSuccess(userCredential.user);
     } catch (error: any) {
       console.error("Login error:", error);
       let errorMessage = "An unexpected error occurred. Please try again.";

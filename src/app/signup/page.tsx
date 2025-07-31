@@ -31,11 +31,15 @@ import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "@/components/layout/header";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  role: z.enum(["buyer", "seller"], {
+    required_error: "You need to select a role.",
+  }),
 });
 
 export default function SignupPage() {
@@ -49,6 +53,7 @@ export default function SignupPage() {
       fullName: "",
       email: "",
       password: "",
+      role: "buyer",
     },
   });
 
@@ -56,6 +61,7 @@ export default function SignupPage() {
     setIsLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, values.email, values.password);
+      // In a real app, you would also save the user's role to your database here.
       toast({
         title: "Account Created!",
         description: "Your account has been successfully created. Please login.",
@@ -130,6 +136,40 @@ export default function SignupPage() {
                       <FormLabel>Password</FormLabel>
                       <FormControl>
                         <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>I am a...</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex space-x-4"
+                        >
+                          <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="buyer" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Buyer
+                            </FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="seller" />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              Seller
+                            </FormLabel>
+                          </FormItem>
+                        </RadioGroup>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

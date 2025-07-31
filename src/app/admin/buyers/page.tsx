@@ -47,6 +47,11 @@ export default function AdminBuyersPage() {
     loadUsers();
   }, []);
 
+  const getStatus = (index: number) => {
+    if (index % 5 === 0) return { variant: "destructive", text: "Suspended" };
+    return { variant: "outline", text: "Active" };
+  }
+
   return (
     <div className="space-y-4">
        <div className="flex items-center justify-between">
@@ -78,44 +83,51 @@ export default function AdminBuyersPage() {
                     Loading buyers...
                   </TableCell>
                 </TableRow>
-              ) : users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.profilePictureUrl} alt={user.displayName} data-ai-hint="person face" />
-                        <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <span className="font-medium">{user.displayName}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge>Active</Badge>
-                  </TableCell>
-                  <TableCell>$ {Math.floor(Math.random() * 1000)}.00</TableCell>
-                  <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onClick={() => navigator.clipboard.writeText(user.id)}
-                      >
-                        Copy user ID
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>View details</DropdownMenuItem>
-                      <DropdownMenuItem>Suspend user</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
+              ) : users.map((user, index) => {
+                const status = getStatus(index);
+                return (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={user.profilePictureUrl} alt={user.displayName} data-ai-hint="person face" />
+                          <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium">{user.displayName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                       <Badge variant={status.variant as any}>{status.text}</Badge>
+                    </TableCell>
+                    <TableCell>$ {Math.floor(Math.random() * 1000)}.00</TableCell>
+                    <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem>View details</DropdownMenuItem>
+                        {status.text !== "Suspended" ? (
+                           <DropdownMenuItem>Suspend user</DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem>Unsuspend user</DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => navigator.clipboard.writeText(user.id)}
+                        >
+                          Copy user ID
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
             </TableBody>
           </Table>
         </CardContent>
@@ -123,3 +135,4 @@ export default function AdminBuyersPage() {
     </div>
   );
 }
+

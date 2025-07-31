@@ -27,7 +27,7 @@ export function AddUserDialog() {
     <Dialog>
       <DialogTrigger asChild>
         <Button>
-            <PlusCircle />
+            <PlusCircle className="mr-2 h-4 w-4"/>
             Add User
         </Button>
       </DialogTrigger>
@@ -60,7 +60,7 @@ export function AddUserDialog() {
                 <SelectContent>
                   <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="seller">Seller</SelectItem>
-                  <SelectItem value="customer">Customer</SelectItem>
+                  <SelectItem value="buyer">Buyer</SelectItem>
                 </SelectContent>
               </Select>
             </div>

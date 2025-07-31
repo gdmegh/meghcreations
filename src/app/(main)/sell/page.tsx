@@ -24,9 +24,8 @@ import { ProductDescriptionGenerator } from "@/components/ai/product-description
 import {
   generateProductDescription
 } from "@/ai/flows/generate-product-description";
-import { getCategories, addProduct } from "@/services/data.service";
+import { addProduct } from "@/services/data.service";
 import { useEffect, useState } from "react";
-import { Combobox } from "@/components/ui/combobox";
 import { useToast } from "@/hooks/use-toast";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, type User } from "firebase/auth";
@@ -34,7 +33,6 @@ import { Loader2, UploadCloud } from "lucide-react";
 
 const formSchema = z.object({
   productName: z.string().min(2, "Product name is required"),
-  productCategory: z.string().min(2, "Category is required"),
   keyFeatures: z.string().min(10, "List at least one key feature"),
   targetAudience: z.string().min(3, "Describe the target audience"),
   price: z.coerce.number().min(0, "Price must be a positive number"),
@@ -46,17 +44,10 @@ export default function SellPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
-  const [categories, setCategories] = useState<{value: string, label: string}[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      const cats = await getCategories();
-      setCategories(cats.map(c => ({ value: c.id, label: c.name })));
-    };
-    fetchCategories();
-
      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
@@ -72,7 +63,6 @@ export default function SellPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       productName: "",
-      productCategory: "",
       keyFeatures: "",
       targetAudience: "",
       price: 0.0,
@@ -103,7 +93,6 @@ export default function SellPage() {
     try {
         await addProduct({
             title: values.productName,
-            categoryId: values.productCategory,
             tags: values.keyFeatures.split(',').map(f => f.trim()),
             price: values.price,
             description: values.description,
@@ -158,26 +147,6 @@ export default function SellPage() {
                         <FormLabel>Product Name</FormLabel>
                         <FormControl>
                           <Input placeholder="e.g., Minimalist UI Kit" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="productCategory"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Category</FormLabel>
-                        <FormControl>
-                           <Combobox
-                            options={categories}
-                            {...field}
-                            onChange={(value) => form.setValue('productCategory', value, { shouldValidate: true })}
-                            value={field.value}
-                            placeholder="Select a category..."
-                            searchPlaceholder="Search categories..."
-                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

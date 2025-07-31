@@ -1,5 +1,5 @@
 
-import { getProductById, getSellerById, getCategoryById } from "@/services/data.service";
+import { getProductById, getSellerById } from "@/services/data.service";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ProductDetailClient } from "@/components/product/product-detail-client";
@@ -36,7 +36,5 @@ export default async function ProductPage({ params }: Props) {
     notFound();
   }
 
-  const category = await getCategoryById(product.categoryId);
-
-  return <ProductDetailClient product={product} seller={seller} category={category} />;
+  return <ProductDetailClient product={product} seller={seller} />;
 }

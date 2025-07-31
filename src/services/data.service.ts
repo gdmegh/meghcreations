@@ -2,7 +2,7 @@
 // This file simulates a data service that would fetch data from a database.
 // Replace the mock data and logic with your actual database queries.
 
-import type { DigitalAsset, Seller, Category, User } from "@/lib/constants";
+import type { DigitalAsset, Seller, User } from "@/lib/constants";
 import { db, storage } from "@/lib/firebase";
 import { collection, doc, getDoc, getDocs, query, where, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -30,7 +30,6 @@ export async function addProduct(productData: Omit<DigitalAsset, 'id' | 'created
 
     const newProductData = {
         title: productData.title,
-        categoryId: productData.categoryId,
         tags: productData.tags,
         price: productData.price,
         description: productData.description,
@@ -150,58 +149,3 @@ export async function getProductsBySellerId(sellerId: string): Promise<DigitalAs
         return [];
     }
 }
-
-export async function getCategories(): Promise<Category[]> {
-    await simulateNetworkDelay(50);
-    try {
-        const categoriesCol = collection(db, 'categories');
-        const categorySnapshot = await getDocs(categoriesCol);
-        const categoryList = categorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Category));
-        return categoryList;
-    } catch (error) {
-        console.error("Error fetching categories:", error);
-        return [];
-    }
-}
-
-export async function getCategoryById(id: string): Promise<Category | undefined> {
-    await simulateNetworkDelay(50);
-    try {
-        const categoryRef = doc(db, 'categories', id);
-        const categorySnap = await getDoc(categoryRef);
-        if (categorySnap.exists()) {
-            return { id: categorySnap.id, ...categorySnap.data() } as Category;
-        }
-    } catch (error) {
-        console.error("Error fetching category:", error);
-    }
-    return undefined;
-}
-
-export async function addCategory(categoryData: { name: string; parentId?: string }): Promise<Category> {
-    await simulateNetworkDelay(100);
-    const newCategory = {
-        createdAt: new Date(),
-        ...categoryData,
-    };
-    const docRef = await addDoc(collection(db, "categories"), newCategory);
-    return {
-        id: docRef.id,
-        ...newCategory,
-    };
-}
-
-export async function updateCategory(id: string, categoryData: { name: string; parentId?: string }): Promise<Category | undefined> {
-    await simulateNetworkDelay(100);
-    const categoryRef = doc(db, 'categories', id);
-    await updateDoc(categoryRef, categoryData);
-    return await getCategoryById(id);
-}
-
-export async function deleteCategory(id: string): Promise<void> {
-    await simulateNetworkDelay(100);
-    const categoryRef = doc(db, 'categories', id);
-    await deleteDoc(categoryRef);
-}
-
-    

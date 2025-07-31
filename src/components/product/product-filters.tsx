@@ -16,43 +16,18 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { getCategories } from "@/services/data.service";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { Category } from "@/lib/constants";
 
 export function ProductFilters() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  useEffect(() => {
-    async function fetchCategories() {
-      const cats = await getCategories();
-      setCategories(cats);
-    }
-    fetchCategories();
-  }, []);
 
   return (
     <Card>
       <CardContent className="p-4">
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4 items-center">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 items-center">
           <div className="relative">
              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input id="search" placeholder="Search products..." className="pl-10" />
-          </div>
-          <div className="space-y-2">
-            <Select>
-              <SelectTrigger id="category">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
           <div className="space-y-2">
             <Slider

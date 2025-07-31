@@ -14,17 +14,9 @@ export type User = {
 // This extends User, for when we know the user is a seller
 // and might have seller-specific properties.
 export type Seller = User & {
-    role: 'seller';
+    role: 'seller' | 'admin';
     rating?: number; // Calculated field
     totalSales?: number; // Calculated field
-};
-
-export type Category = {
-  id: string;
-  name: string;
-  createdAt: Date;
-  description?: string;
-  parentId?: string;
 };
 
 export type DigitalAsset = {
@@ -35,7 +27,6 @@ export type DigitalAsset = {
   fileUrl: string;
   assetType: string; // e.g., 'UI Kit', 'Icon Set', 'eBook'
   creatorId: string;
-  categoryId: string;
   createdAt: Date;
   isPublished: boolean;
   description?: string;
@@ -64,4 +55,3 @@ export type Review = {
 
 export const products: DigitalAsset[] = [];
 export const sellers: Seller[] = [];
-export const categories: Category[] = [];

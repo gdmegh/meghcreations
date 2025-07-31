@@ -45,14 +45,7 @@ export default function AdminLayout({
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { 
-      label: "Products", 
-      icon: Package,
-      children: [
-        { href: "/admin/products", label: "All Products" },
-        { href: "/admin/products/categories", label: "Categories" },
-      ]
-    },
+    { href: "/admin/products", label: "Products", icon: Package },
     { href: "/admin/sellers", label: "Sellers", icon: User },
     { href: "/admin/buyers", label: "Buyers", icon: ShoppingBag },
     { href: "/admin/payments", label: "Payments", icon: CreditCard },
@@ -119,7 +112,7 @@ export default function AdminLayout({
         href={item.href}
         className={cn(
           "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-          isActive(item.href, item.href === '/admin') && "bg-muted text-primary font-bold"
+          isActive(item.href, item.href === '/admin' || item.href === '/admin/products') && "bg-muted text-primary font-bold"
         )}
       >
         <item.icon className="h-4 w-4" />
@@ -159,7 +152,7 @@ export default function AdminLayout({
           href={item.href}
           className={cn(
             "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
-            isActive(item.href, item.href === '/admin') && "bg-muted text-foreground"
+            isActive(item.href, item.href === '/admin' || item.href === '/admin/products') && "bg-muted text-foreground"
           )}
         >
             <item.icon className="h-5 w-5" />

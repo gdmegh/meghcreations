@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Star, CheckCircle, ZoomIn, ZoomOut, Redo, Maximize, X } from "lucide-react";
 import { useState } from "react";
-import type { DigitalAsset, Seller, Category } from "@/lib/constants";
+import type { DigitalAsset, Seller } from "@/lib/constants";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,7 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -22,10 +21,9 @@ import { cn } from "@/lib/utils";
 interface ProductDetailClientProps {
     product: DigitalAsset;
     seller: Seller;
-    category?: Category;
 }
 
-export function ProductDetailClient({ product, seller, category }: ProductDetailClientProps) {
+export function ProductDetailClient({ product, seller }: ProductDetailClientProps) {
   const [zoom, setZoom] = useState(1);
   const [isFullScreen, setIsFullScreen] = useState(false);
   
@@ -107,7 +105,7 @@ export function ProductDetailClient({ product, seller, category }: ProductDetail
 
           <div className={cn("md:col-span-1 flex-col gap-6", isFullScreen ? "hidden" : "flex")}>
             <div>
-              <Badge variant="secondary">{category?.name || product.assetType}</Badge>
+              <Badge variant="secondary">{product.assetType}</Badge>
               <h1 className="text-4xl font-bold font-headline mt-2">
                 {product.title}
               </h1>

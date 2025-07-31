@@ -1,15 +1,12 @@
+
 "use client";
 
 import { useState } from "react";
-import { useForm, type UseFormReturn } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { type UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import type { GenerateProductDescriptionInput } from "@/ai/flows/generate-product-description";
 
@@ -17,7 +14,6 @@ const formSchema = z.object({
   productName: z.string().min(2, {
     message: "Product name must be at least 2 characters.",
   }),
-  productCategory: z.string().min(2),
   keyFeatures: z.string().min(10),
   targetAudience: z.string().min(5),
 });
@@ -37,14 +33,14 @@ export function ProductDescriptionGenerator({
   const { toast } = useToast();
 
   const handleGenerateDescription = async () => {
-    const { productName, productCategory, keyFeatures, targetAudience } =
+    const { productName, keyFeatures, targetAudience } =
       form.getValues();
 
-    if (!productName || !productCategory || !keyFeatures || !targetAudience) {
+    if (!productName || !keyFeatures || !targetAudience) {
       toast({
         title: "Missing Information",
         description:
-          "Please fill out Product Name, Category, Key Features, and Target Audience to generate a description.",
+          "Please fill out Product Name, Key Features, and Target Audience to generate a description.",
         variant: "destructive",
       });
       return;
@@ -54,7 +50,6 @@ export function ProductDescriptionGenerator({
     try {
       const result = await generateDescriptionAction({
         productName,
-        productCategory,
         keyFeatures,
         targetAudience,
       });

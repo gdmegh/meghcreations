@@ -1,3 +1,4 @@
+
 // src/ai/flows/generate-product-description.ts
 'use server';
 
@@ -14,7 +15,6 @@ import {z} from 'genkit';
 
 const GenerateProductDescriptionInputSchema = z.object({
   productName: z.string().describe('The name of the product.'),
-  productCategory: z.string().describe('The category of the product.'),
   keyFeatures: z.string().describe('Key features of the product, comma separated.'),
   targetAudience: z.string().describe('The target audience for the product.'),
 });
@@ -38,7 +38,6 @@ const prompt = ai.definePrompt({
   Based on the product details provided, write a product description that is engaging, informative, and persuasive.
 
   Product Name: {{{productName}}}
-  Product Category: {{{productCategory}}}
   Key Features: {{{keyFeatures}}}
   Target Audience: {{{targetAudience}}}
 

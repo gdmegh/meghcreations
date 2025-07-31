@@ -93,27 +93,27 @@ export default function ProductPage({
                         data-ai-hint="digital product screenshot"
                       />
                     </div>
+                     <div className="absolute top-4 right-4 flex items-center gap-2">
+                        <Button variant="outline" size="icon" onClick={handleZoomOut} className="bg-background/50 hover:bg-background/80">
+                            <ZoomOut />
+                            <span className="sr-only">Zoom Out</span>
+                        </Button>
+                        <Button variant="outline" size="icon" onClick={handleResetZoom} className="bg-background/50 hover:bg-background/80">
+                            <Redo />
+                            <span className="sr-only">Reset Zoom</span>
+                        </Button>
+                        <Button variant="outline" size="icon" onClick={handleZoomIn} className="bg-background/50 hover:bg-background/80">
+                            <ZoomIn />
+                            <span className="sr-only">Zoom In</span>
+                        </Button>
+                        <Button variant="outline" size="icon" onClick={toggleFullScreen} className="bg-background/50 hover:bg-background/80">
+                            <Maximize />
+                            <span className="sr-only">Fullscreen</span>
+                        </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-              <div className="flex justify-center items-center gap-2 mt-4">
-                  <Button variant="outline" size="icon" onClick={handleZoomOut}>
-                      <ZoomOut />
-                      <span className="sr-only">Zoom Out</span>
-                  </Button>
-                  <Button variant="outline" size="icon" onClick={handleResetZoom}>
-                      <Redo />
-                      <span className="sr-only">Reset Zoom</span>
-                  </Button>
-                  <Button variant="outline" size="icon" onClick={handleZoomIn}>
-                      <ZoomIn />
-                      <span className="sr-only">Zoom In</span>
-                  </Button>
-                  <Button variant="outline" size="icon" onClick={toggleFullScreen}>
-                      <Maximize />
-                      <span className="sr-only">Fullscreen</span>
-                  </Button>
-              </div>
             </div>
           </div>
 

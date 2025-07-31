@@ -1,9 +1,9 @@
-// src/app/(admin)/layout.tsx
+
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Menu, Settings, UploadCloud } from "lucide-react";
+import { LayoutDashboard, Menu, Settings } from "lucide-react";
 
 import {
   SidebarProvider,
@@ -14,11 +14,11 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarTrigger,
   SidebarInset,
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import { AdminHeader } from "@/components/admin/admin-header";
 
 export default function AdminLayout({
   children,
@@ -85,13 +85,7 @@ export default function AdminLayout({
           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
-            <header className="flex items-center justify-between p-4 border-b md:hidden">
-                <Link href="/" className="flex items-center gap-2">
-                    <Logo className="h-6 w-6 text-primary" />
-                    <span className="font-bold font-headline">MeghMarket</span>
-                </Link>
-                <SidebarTrigger />
-            </header>
+            <AdminHeader />
             <main className="p-4 md:p-8">
                 {children}
             </main>

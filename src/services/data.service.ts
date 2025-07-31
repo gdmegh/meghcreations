@@ -3,31 +3,46 @@
 // Replace the mock data and logic with your actual database queries.
 
 import type { DigitalAsset, Seller, Category, User } from "@/lib/constants";
-import { db } from "@/lib/firebase";
+import { db, storage } from "@/lib/firebase";
 import { collection, doc, getDoc, getDocs, query, where, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // Adding a delay to simulate network latency
 const simulateNetworkDelay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
-export async function addProduct(productData: Omit<DigitalAsset, 'id' | 'createdAt' | 'creatorId' | 'isPublished' | 'previewImageUrl' | 'fileUrl'> & { creatorId: string, previewImageFile?: File }): Promise<DigitalAsset> {
+// Helper function to upload a file and get its URL
+async function uploadFileAndGetURL(file: File, path: string): Promise<string> {
+    const storageRef = ref(storage, path);
+    await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+}
+
+
+export async function addProduct(productData: Omit<DigitalAsset, 'id' | 'createdAt' | 'isPublished' | 'previewImageUrl' | 'fileUrl'> & { previewImageFile: File }): Promise<DigitalAsset> {
     await simulateNetworkDelay(100);
-    // In a real app, you would upload the file to storage (e.g., Firebase Storage)
-    // and get a URL back. For now, we'll use a placeholder.
-    const previewImageUrl = productData.previewImageFile 
-        ? URL.createObjectURL(productData.previewImageFile) 
-        : `https://placehold.co/600x400.png`;
+    
+    let previewImageUrl = `https://placehold.co/600x400.png`;
+    if (productData.previewImageFile) {
+        const filePath = `product-images/${productData.creatorId}/${Date.now()}-${productData.previewImageFile.name}`;
+        previewImageUrl = await uploadFileAndGetURL(productData.previewImageFile, filePath);
+    }
 
     const newProductData = {
-        ...productData,
-        isPublished: true, // Default to published for now
+        title: productData.title,
+        categoryId: productData.categoryId,
+        tags: productData.tags,
+        price: productData.price,
+        description: productData.description,
+        priceType: productData.priceType,
+        assetType: productData.assetType,
+        creatorId: productData.creatorId,
+        isPublished: true,
         createdAt: new Date(),
         previewImageUrl,
-        fileUrl: "mock/file.zip", // Placeholder
+        fileUrl: "mock/file.zip",
     };
     
-    // Remove the file object before saving to Firestore
-    delete newProductData.previewImageFile;
-
     const docRef = await addDoc(collection(db, "digital_assets"), newProductData);
     
     return {
@@ -41,7 +56,7 @@ export async function getSellers(): Promise<Seller[]> {
     await simulateNetworkDelay(50);
     try {
         const sellersCol = collection(db, 'users');
-        const q = query(sellersCol, where("role", "==", "seller"));
+        const q = query(sellersCol, where("role", "in", ["seller", "admin"]));
         const sellerSnapshot = await getDocs(q);
         const sellerList = sellerSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Seller));
         return sellerList;
@@ -64,27 +79,31 @@ export async function getUserById(id: string): Promise<User | undefined> {
         }
     } catch (error) {
         console.error(`Error fetching user by ID (${id}):`, error);
-        console.log("This might be because you haven't created the Firestore database or set up security rules yet.");
         return undefined;
     }
 }
+
+export async function updateUser(userId: string, data: { displayName?: string, bio?: string, profilePictureFile?: File }): Promise<void> {
+    const userRef = doc(db, "users", userId);
+    const updateData: { [key: string]: any } = {};
+
+    if (data.displayName) updateData.displayName = data.displayName;
+    if (data.bio) updateData.bio = data.bio;
+
+    if (data.profilePictureFile) {
+        const filePath = `profile-pictures/${userId}/${data.profilePictureFile.name}`;
+        const photoURL = await uploadFileAndGetURL(data.profilePictureFile, filePath);
+        updateData.profilePictureUrl = photoURL;
+    }
+
+    await updateDoc(userRef, updateData);
+}
+
 
 export async function getSellerById(id: string): Promise<Seller | undefined> {
     const user = await getUserById(id);
     if (user && (user.role === 'seller' || user.role === 'admin')) {
         return user as Seller;
-    }
-    // Fallback for demo purposes if user is not found or not a seller
-    if (!user) {
-        try {
-            const defaultSellerRef = doc(db, 'users', 'seller-1');
-            const defaultSellerSnap = await getDoc(defaultSellerRef);
-            if (defaultSellerSnap.exists()) {
-                return { id: defaultSellerSnap.id, ...defaultSellerSnap.data()} as Seller;
-            }
-        } catch (e) {
-            // ignore
-        }
     }
     return undefined;
 }
@@ -98,7 +117,6 @@ export async function getProducts(): Promise<DigitalAsset[]> {
         return productList;
     } catch (error) {
         console.error("Error fetching products:", error);
-        console.log("This might be because you haven't created the Firestore database or set up security rules yet.");
         return [];
     }
 }
@@ -115,7 +133,6 @@ export async function getProductById(id: string): Promise<DigitalAsset | undefin
         }
     } catch (error) {
         console.error(`Error fetching product by ID (${id}):`, error);
-        console.log("This might be because you haven't created the Firestore database or set up security rules yet.");
         return undefined;
     }
 }
@@ -130,7 +147,6 @@ export async function getProductsBySellerId(sellerId: string): Promise<DigitalAs
         return productList;
     } catch (error) {
         console.error(`Error fetching products by seller ID (${sellerId}):`, error);
-        console.log("This might be because you haven't created the Firestore database or set up security rules yet.");
         return [];
     }
 }
@@ -144,7 +160,6 @@ export async function getCategories(): Promise<Category[]> {
         return categoryList;
     } catch (error) {
         console.error("Error fetching categories:", error);
-        console.log("This might be because you haven't created the Firestore database or set up security rules yet.");
         return [];
     }
 }
@@ -188,3 +203,5 @@ export async function deleteCategory(id: string): Promise<void> {
     const categoryRef = doc(db, 'categories', id);
     await deleteDoc(categoryRef);
 }
+
+    

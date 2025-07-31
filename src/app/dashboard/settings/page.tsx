@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
-import Image from "next/image";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { auth } from "@/lib/firebase";
-import { getSellerById } from "@/services/data.service";
+import { getSellerById, updateUser } from "@/services/data.service";
 import type { Seller } from "@/lib/constants";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -55,8 +54,8 @@ export default function SellerSettingsPage() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        // Using a default seller for now as user roles aren't fully implemented
-        const currentSeller = await getSellerById("seller-1"); 
+        // In a real app, you would fetch the user's actual seller profile
+        const currentSeller = await getSellerById(currentUser.uid); 
         if (currentSeller) {
           setSeller(currentSeller);
           form.reset({
@@ -86,27 +85,41 @@ export default function SellerSettingsPage() {
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user) {
+      toast({ title: "Not Authenticated", description: "You must be logged in to save settings.", variant: "destructive" });
+      return;
+    }
     setIsSaving(true);
-    // In a real application, you would handle the file upload here.
-    // This could involve uploading the `values.profilePicture` file to a service
-    // like Firebase Storage and getting a URL back.
-    // Then you would save the `displayName`, `bio`, and the new image URL
-    // to your Firestore database.
-
-    console.log("Saving data:", {
-      displayName: values.displayName,
-      bio: values.bio,
-      fileName: values.profilePicture?.name,
-    });
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      await updateUser(user.uid, {
+        displayName: values.displayName,
+        bio: values.bio,
+        profilePictureFile: values.profilePicture,
+      });
 
-    toast({
-      title: "Profile Saved!",
-      description: "Your seller profile has been updated.",
-    });
-    setIsSaving(false);
+      toast({
+        title: "Profile Saved!",
+        description: "Your seller profile has been updated.",
+      });
+
+      // Refresh the seller data to show new image
+      const updatedSeller = await getSellerById(user.uid);
+      if (updatedSeller) {
+        setSeller(updatedSeller);
+        setPreviewImage(updatedSeller.profilePictureUrl);
+      }
+
+    } catch (error) {
+      console.error("Failed to update profile", error);
+       toast({
+        title: "Save Failed",
+        description: "Could not update your profile. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   if (isLoading) {
@@ -194,9 +207,6 @@ export default function SellerSettingsPage() {
                              />
                         </FormControl>
                     </div>
-                    <FormDescription>
-                        Note: Backend implementation is required to store the uploaded file.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -212,3 +222,5 @@ export default function SellerSettingsPage() {
     </div>
   );
 }
+
+    

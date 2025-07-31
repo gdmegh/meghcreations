@@ -170,10 +170,11 @@ export default function SellPage() {
                       <FormItem className="flex flex-col">
                         <FormLabel>Category</FormLabel>
                         <FormControl>
-                          <Combobox
+                           <Combobox
                             options={categories}
                             {...field}
                             onChange={(value) => form.setValue('productCategory', value, { shouldValidate: true })}
+                            value={field.value}
                             placeholder="Select a category..."
                             searchPlaceholder="Search categories..."
                           />

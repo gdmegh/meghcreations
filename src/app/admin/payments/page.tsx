@@ -7,6 +7,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import {
     Table,
     TableBody,
@@ -19,7 +28,7 @@ import {
 
 export default function AdminPaymentsPage() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold font-headline">Payments</h1>
         <p className="text-muted-foreground">
@@ -64,7 +73,34 @@ export default function AdminPaymentsPage() {
             </Table>
         </CardContent>
       </Card>
+       <Card>
+        <CardHeader>
+          <CardTitle>Payment & Disbursement</CardTitle>
+          <CardDescription>
+            Configure payment gateway settings. This is a placeholder UI.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+           <div className="space-y-2">
+            <Label>Stripe API Key</Label>
+            <Input type="password" placeholder="sk_test_••••••••••••••••••••••••" />
+          </div>
+           <div className="space-y-2">
+            <Label>Disbursement Schedule</Label>
+             <Select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a schedule" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                </SelectContent>
+              </Select>
+          </div>
+          <Button>Save Payment Settings</Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-

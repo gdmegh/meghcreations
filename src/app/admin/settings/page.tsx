@@ -1,4 +1,6 @@
 
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,14 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-
 
 export default function AdminSettingsPage() {
   return (
@@ -43,43 +37,18 @@ export default function AdminSettingsPage() {
             <Input defaultValue="MeghMarket" />
           </div>
           <div className="space-y-2">
-            <Label>Logo</Label>
+            <Label htmlFor="logo-upload">Logo</Label>
             <div className="flex items-center gap-4">
                 <div className="w-20 h-20 border-2 border-dashed rounded-lg flex items-center justify-center bg-muted">
                     <p className="text-xs text-muted-foreground">Logo</p>
                 </div>
-                 <Button variant="outline" type="button">Upload New Logo</Button>
+                 <Input id="logo-upload" type="file" className="max-w-xs" />
             </div>
+            <p className="text-xs text-muted-foreground">
+                Upload your site logo. This is a UI placeholder; backend implementation is required.
+            </p>
           </div>
-        </CardContent>
-      </Card>
-
-       <Card>
-        <CardHeader>
-          <CardTitle>Payment & Disbursement</CardTitle>
-          <CardDescription>
-            Configure payment gateway settings. This is a placeholder UI.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-           <div className="space-y-2">
-            <Label>Stripe API Key</Label>
-            <Input type="password" placeholder="sk_test_••••••••••••••••••••••••" />
-          </div>
-           <div className="space-y-2">
-            <Label>Disbursement Schedule</Label>
-             <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a schedule" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                </SelectContent>
-              </Select>
-          </div>
-          <Button>Save Payment Settings</Button>
+           <Button>Save Site Configuration</Button>
         </CardContent>
       </Card>
     </div>

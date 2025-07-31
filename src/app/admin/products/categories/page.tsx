@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { MoreHorizontal } from "lucide-react";
 import type { Category } from "@/lib/constants";
-import { getCategories } from "@/services/data.service";
+import { getCategories, deleteCategory } from "@/services/data.service";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -49,18 +49,24 @@ export default function AdminCategoriesPage() {
     setIsDeleteDialogOpen(true);
   }
 
-  const onConfirmDelete = () => {
+  const onConfirmDelete = async () => {
     if (!selectedCategory) return;
-    // Backend logic to delete would go here.
-    console.log("Deleting category:", selectedCategory);
-    toast({
-      title: "Category Deleted",
-      description: `The category "${selectedCategory.name}" has been deleted.`,
-    });
-    setIsDeleteDialogOpen(false);
-    setSelectedCategory(undefined);
-    // You would re-fetch categories here
-    loadCategories(); 
+    try {
+      await deleteCategory(selectedCategory.id);
+      toast({
+        title: "Category Deleted",
+        description: `The category "${selectedCategory.name}" has been deleted.`,
+      });
+      setIsDeleteDialogOpen(false);
+      setSelectedCategory(undefined);
+      loadCategories(); // Re-fetch categories
+    } catch(error) {
+       toast({
+        title: "Delete Failed",
+        description: "Could not delete the category. Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   const getParentCategoryName = (parentId?: string) => {

@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useEffect, useState } from "react"
 import type { Category } from "@/lib/constants"
-import { getCategories } from "@/services/data.service"
+import { getCategories, addCategory, updateCategory } from "@/services/data.service"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
@@ -32,6 +32,7 @@ export function AddCategoryDialog({ children, isOpen, setIsOpen, category, onFin
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [name, setName] = useState("");
   const [parentId, setParentId] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,19 +54,34 @@ export function AddCategoryDialog({ children, isOpen, setIsOpen, category, onFin
     }
   }, [isOpen, category]);
 
-  const handleSave = () => {
-    const action = category ? "Updating" : "Saving";
+  const handleSave = async () => {
+    setIsLoading(true);
     const verb = category ? "Updated" : "Created";
     
-    console.log(`${action} category:`, { id: category?.id, name, parentId });
-    
-    toast({
-        title: `Category ${verb}!`,
-        description: `The category "${name}" has been successfully ${verb.toLowerCase()}.`,
-    });
-    
-    if(onFinished) onFinished();
-    setIsOpen(false);
+    try {
+      if (category) {
+        await updateCategory(category.id, { name, parentId });
+      } else {
+        await addCategory({ name, parentId });
+      }
+      
+      toast({
+          title: `Category ${verb}!`,
+          description: `The category "${name}" has been successfully ${verb.toLowerCase()}.`,
+      });
+      
+      if(onFinished) onFinished();
+      setIsOpen(false);
+
+    } catch (error) {
+       toast({
+        title: "Operation Failed",
+        description: "Could not save the category. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+        setIsLoading(false);
+    }
   }
 
   return (
@@ -114,7 +130,9 @@ export function AddCategoryDialog({ children, isOpen, setIsOpen, category, onFin
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button onClick={handleSave} disabled={!name}>Save Category</Button>
+          <Button onClick={handleSave} disabled={!name || isLoading}>
+            {isLoading ? "Saving..." : "Save Category"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

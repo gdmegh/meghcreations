@@ -38,7 +38,14 @@ export default function AdminLayout({
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/products", label: "All Products", icon: Package },
+    { 
+      label: "Products", 
+      icon: Package,
+      children: [
+        { href: "/admin/products", label: "All Products" },
+        { href: "/admin/products/categories", label: "Categories" },
+      ]
+    },
     { href: "/admin/sellers", label: "Sellers", icon: User },
     { href: "/admin/buyers", label: "Buyers", icon: ShoppingBag },
     { href: "/admin/payments", label: "Payments", icon: CreditCard },
@@ -55,6 +62,10 @@ export default function AdminLayout({
 
   const isActive = (path: string, exact: boolean = false) => {
     if (!path) return false;
+    // Special case for /admin/products to avoid matching /admin/products/categories
+    if (path === '/admin/products') {
+      return pathname === path;
+    }
     if (exact) return pathname === path;
     return pathname.startsWith(path);
   };
@@ -84,7 +95,7 @@ export default function AdminLayout({
                   href={child.href}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                    isActive(child.href, child.href === '/admin/settings') && "bg-muted text-primary font-bold"
+                    isActive(child.href, child.href === '/admin/settings' || child.href === '/admin/products') && "bg-muted text-primary font-bold"
                   )}
                 >
                   {child.label}
@@ -125,7 +136,7 @@ export default function AdminLayout({
                   href={child.href}
                   className={cn(
                     "rounded-md px-3 py-2 text-muted-foreground hover:text-foreground",
-                     isActive(child.href, child.href === '/admin/settings') && "bg-muted text-foreground"
+                     isActive(child.href, child.href === '/admin/settings' || child.href === '/admin/products') && "bg-muted text-foreground"
                   )}
                 >
                   {child.label}

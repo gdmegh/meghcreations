@@ -3,7 +3,6 @@
 // Base User, which can be a buyer or a seller
 export type User = {
   id: string;
-  username: string;
   email: string;
   createdAt: Date;
   role: 'buyer' | 'seller' | 'admin';

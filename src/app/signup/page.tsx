@@ -9,8 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { Loader2 } from "lucide-react";
+import { doc, setDoc } from "firebase/firestore";
 
-import { auth } from "@/lib/firebase";
+
+import { auth, db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,7 +36,7 @@ import { Header } from "@/components/layout/header";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const formSchema = z.object({
-  fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
+  displayName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
   role: z.enum(["buyer", "seller"], {
@@ -50,7 +52,7 @@ export default function SignupPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: "",
+      displayName: "",
       email: "",
       password: "",
       role: "buyer",
@@ -60,8 +62,19 @@ export default function SignupPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, values.email, values.password);
-      // In a real app, you would also save the user's role to your database here.
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
+      
+      // Save user data to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        displayName: values.displayName,
+        email: values.email,
+        role: values.role,
+        createdAt: new Date(),
+        profilePictureUrl: `https://placehold.co/100x100.png`, // Default placeholder
+        bio: "",
+      });
+
       toast({
         title: "Account Created!",
         description: "Your account has been successfully created. Please login.",
@@ -100,7 +113,7 @@ export default function SignupPage() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="fullName"
+                  name="displayName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>

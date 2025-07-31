@@ -11,7 +11,8 @@ import {
   Package,
   LogOut,
   LogIn,
-  UserPlus
+  UserPlus,
+  Crown
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
@@ -32,10 +33,12 @@ import {
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import { getSellerById } from "@/services/data.service";
-import type { Seller } from "@/lib/constants";
+import { useUser } from "@/hooks/use-user";
 
 export function Header() {
+  const { user } = useUser();
+  const isSeller = user?.role === 'seller' || user?.role === 'admin';
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center px-4 md:px-8">
@@ -53,12 +56,14 @@ export function Header() {
             >
               Browse
             </Link>
-            <Link
-              href="/sell"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-            >
-              Sell
-            </Link>
+            {isSeller && (
+              <Link
+                href="/sell"
+                className="transition-colors hover:text-foreground/80 text-foreground/60"
+              >
+                Sell
+              </Link>
+            )}
           </nav>
         </div>
 
@@ -70,8 +75,8 @@ export function Header() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="pr-0">
-             <SheetHeader className="sr-only">
-              <SheetTitle>Mobile Navigation Menu</SheetTitle>
+             <SheetHeader>
+                <SheetTitle className="sr-only">Mobile Navigation Menu</SheetTitle>
             </SheetHeader>
             <Link href="/" className="mr-6 flex items-center space-x-2">
               <Logo className="h-6 w-6 text-primary" />
@@ -82,9 +87,11 @@ export function Header() {
                 <Link href="/" className="text-foreground">
                   Browse
                 </Link>
-                <Link href="/sell" className="text-foreground/60">
-                  Sell
-                </Link>
+                 {isSeller && (
+                  <Link href="/sell" className="text-foreground/60">
+                    Sell
+                  </Link>
+                )}
               </div>
             </div>
           </SheetContent>
@@ -118,32 +125,9 @@ export function Header() {
 }
 
 function UserDropdown() {
-  const [user, setUser] = useState<User | null>(null);
-  const [seller, setSeller] = useState<Seller | undefined>(undefined);
+  const { user, firebaseUser } = useUser();
   const { toast } = useToast();
   const router = useRouter();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        // Assuming a mapping between Firebase UID and your seller ID.
-        // This is a placeholder; you might have a 'users' collection
-        // where you store the role and can check if the user is a seller.
-        const currentSeller = await getSellerById(currentUser.uid);
-        if (currentSeller) {
-          setSeller(currentSeller);
-        } else {
-           // For now, let's use a default seller profile for any logged in user
-           const defaultSeller = await getSellerById("seller-1");
-           setSeller(defaultSeller);
-        }
-      } else {
-        setSeller(undefined);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
 
   const handleLogout = async () => {
     try {
@@ -162,6 +146,9 @@ function UserDropdown() {
     }
   };
 
+  const isSeller = user?.role === 'seller' || user?.role === 'admin';
+  const isAdmin = user?.role === 'admin';
+
   return (
     <Dropdown>
       <DropdownMenuTrigger asChild>
@@ -171,39 +158,45 @@ function UserDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
-          {user ? `Logged in as ${user.email}` : "My Account"}
+          {firebaseUser ? `Logged in as ${firebaseUser.email}` : "My Account"}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {user ? (
+        {firebaseUser ? (
           <>
-            <DropdownMenuGroup>
-              <Link href="/dashboard">
-                <DropdownMenuItem>
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
-                  <span>Dashboard</span>
-                </DropdownMenuItem>
-              </Link>
-              {seller && (
-                <Link href={`/${seller.id}`}>
+            {isSeller && (
+              <DropdownMenuGroup>
+                <Link href="/dashboard">
+                  <DropdownMenuItem>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Seller Dashboard</span>
+                  </DropdownMenuItem>
+                </Link>
+                <Link href={`/${user?.id}`}>
                   <DropdownMenuItem>
                     <UserCircle className="mr-2 h-4 w-4" />
                     <span>Public Profile</span>
                   </DropdownMenuItem>
                 </Link>
-              )}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Site Management
-              </DropdownMenuLabel>
-              <Link href="/admin">
-                <DropdownMenuItem>
-                  <Package className="mr-2 h-4 w-4" />
-                  <span>Admin Panel</span>
-                </DropdownMenuItem>
-              </Link>
-            </DropdownMenuGroup>
+              </DropdownMenuGroup>
+            )}
+
+            {isAdmin && (
+              <>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="text-xs text-muted-foreground">
+                  Site Management
+                </DropdownMenuLabel>
+                <Link href="/admin">
+                  <DropdownMenuItem>
+                    <Crown className="mr-2 h-4 w-4" />
+                    <span>Admin Panel</span>
+                  </DropdownMenuItem>
+                </Link>
+              </DropdownMenuGroup>
+              </>
+            )}
+
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />

@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Menu,
@@ -10,6 +10,7 @@ import {
   Home,
   DollarSign,
   Settings,
+  Loader2,
 } from "lucide-react";
 import * as React from 'react';
 
@@ -18,6 +19,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/icons";
 import { AdminHeader } from "@/components/admin/admin-header";
+import { useUser } from "@/hooks/use-user";
 
 export default function DashboardLayout({
   children,
@@ -25,11 +27,16 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [isMounted, setIsMounted] = React.useState(false);
+  const router = useRouter();
+  const { user, isLoading } = useUser();
 
   React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    if (!isLoading && !user) {
+      router.push('/login');
+    } else if (!isLoading && user && user.role !== 'seller' && user.role !== 'admin') {
+      router.push('/');
+    }
+  }, [isLoading, user, router]);
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -58,10 +65,15 @@ export default function DashboardLayout({
       {item.label}
     </Link>
   );
-
-  if (!isMounted) {
-    return null;
+  
+  if (isLoading || !user || (user.role !== 'seller' && user.role !== 'admin')) {
+    return (
+       <div className="flex min-h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
   }
+
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">

@@ -7,7 +7,8 @@ import {
   LayoutDashboard,
   Menu,
   Package,
-  Users
+  Home,
+  DollarSign
 } from "lucide-react";
 import * as React from 'react';
 
@@ -17,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { Logo } from "@/components/icons";
 import { AdminHeader } from "@/components/admin/admin-header";
 
-export default function AdminLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -30,13 +31,14 @@ export default function AdminLayout({
   }, []);
 
   const navItems = [
-    { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/products", label: "All Products", icon: Package },
-    { href: "/admin/customers", label: "Customers", icon: Users },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard/products", label: "My Products", icon: Package },
+    { href: "/dashboard/sales", label: "Sales", icon: DollarSign },
+    { href: "/", label: "Back to Shop", icon: Home },
   ];
 
   const isActive = (path: string) => {
-    if (path === "/admin") {
+    if (path === "/dashboard") {
       return pathname === path;
     }
     return pathname.startsWith(path);
@@ -66,7 +68,7 @@ export default function AdminLayout({
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Logo className="h-6 w-6 text-primary" />
-              <span className="">MeghMarket Admin</span>
+              <span className="">Seller Dashboard</span>
             </Link>
           </div>
           <div className="flex-1">
@@ -98,7 +100,7 @@ export default function AdminLayout({
                   className="flex items-center gap-2 text-lg font-semibold mb-4"
                 >
                   <Logo className="h-6 w-6 text-primary" />
-                  <span className="">MeghMarket Admin</span>
+                  <span className="">Seller Dashboard</span>
                 </Link>
                 {navItems.map((item) => (
                   <Link

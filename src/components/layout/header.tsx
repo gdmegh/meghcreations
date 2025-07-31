@@ -140,7 +140,7 @@ function UserDropdown() {
             <Link href={`/${seller.id}`}>
               <DropdownMenuItem>
                 <UserCircle className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+                <span>Public Profile</span>
               </DropdownMenuItem>
             </Link>
           )}
@@ -148,12 +148,12 @@ function UserDropdown() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuLabel className="text-xs text-muted-foreground">
-            Seller
+            Site Management
           </DropdownMenuLabel>
           <Link href="/admin">
             <DropdownMenuItem>
               <Package className="mr-2 h-4 w-4" />
-              <span>Seller Dashboard</span>
+              <span>Admin Panel</span>
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>

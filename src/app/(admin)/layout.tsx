@@ -8,13 +8,11 @@ import { LayoutDashboard, Menu, Settings } from "lucide-react";
 import {
   SidebarProvider,
   Sidebar,
-  SidebarHeader,
   SidebarContent,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarInset,
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/icons";
 import { Button } from "@/components/ui/button";
@@ -35,8 +33,8 @@ export default function AdminLayout({
     <SidebarProvider>
       <div className="flex flex-col min-h-screen bg-background">
         <AdminHeader />
-        <div className="flex flex-1">
-            <Sidebar>
+        <div className="flex flex-1 mt-4">
+            <Sidebar collapsible="none">
             <SidebarContent>
                 <SidebarMenu>
                 <SidebarMenuItem>
@@ -80,11 +78,9 @@ export default function AdminLayout({
                 </Button>
             </SidebarFooter>
             </Sidebar>
-            <SidebarInset>
-                <main className="p-4 md:p-8">
-                    {children}
-                </main>
-            </SidebarInset>
+            <main className="flex-1 p-4 md:p-8">
+                {children}
+            </main>
         </div>
       </div>
     </SidebarProvider>

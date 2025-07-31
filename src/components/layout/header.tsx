@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/icons";
 import { auth } from "@/lib/firebase";
 import {
@@ -70,6 +70,9 @@ export function Header() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="pr-0">
+             <SheetHeader className="sr-only">
+              <SheetTitle>Mobile Navigation Menu</SheetTitle>
+            </SheetHeader>
             <Link href="/" className="mr-6 flex items-center space-x-2">
               <Logo className="h-6 w-6 text-primary" />
               <span className="font-bold font-headline">MeghMarket</span>

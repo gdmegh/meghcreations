@@ -8,7 +8,8 @@ import {
   Menu,
   Package,
   Home,
-  DollarSign
+  DollarSign,
+  Settings,
 } from "lucide-react";
 import * as React from 'react';
 
@@ -34,6 +35,7 @@ export default function DashboardLayout({
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/dashboard/products", label: "My Products", icon: Package },
     { href: "/dashboard/sales", label: "Sales", icon: DollarSign },
+    { href: "/dashboard/settings", label: "Settings", icon: Settings },
     { href: "/", label: "Back to Shop", icon: Home },
   ];
 

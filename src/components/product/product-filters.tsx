@@ -26,7 +26,7 @@ export function ProductFilters() {
   useEffect(() => {
     async function fetchCategories() {
       const cats = await getCategories();
-      setCategories([{id: 'all', name: 'All Categories', createdAt: new Date()}, ...cats]);
+      setCategories(cats);
     }
     fetchCategories();
   }, []);
@@ -45,6 +45,7 @@ export function ProductFilters() {
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}

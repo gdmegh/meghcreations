@@ -56,14 +56,6 @@ export function Header() {
             >
               Browse
             </Link>
-            {isSeller && (
-              <Link
-                href="/sell"
-                className="transition-colors hover:text-foreground/80 text-foreground/60"
-              >
-                Sell
-              </Link>
-            )}
           </nav>
         </div>
 
@@ -87,11 +79,6 @@ export function Header() {
                 <Link href="/" className="text-foreground">
                   Browse
                 </Link>
-                 {isSeller && (
-                  <Link href="/sell" className="text-foreground/60">
-                    Sell
-                  </Link>
-                )}
               </div>
             </div>
           </SheetContent>

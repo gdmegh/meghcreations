@@ -30,9 +30,6 @@ export default async function HomePage() {
                 <ArrowRight />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/sell">Become a Seller</Link>
-            </Button>
           </div>
         </div>
       </section>

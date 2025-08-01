@@ -67,12 +67,6 @@ export default function AdminProductsPage() {
             A list of all products on the platform.
           </p>
         </div>
-        <Button asChild>
-          <Link href="/sell">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Product
-          </Link>
-        </Button>
       </div>
       <Card>
         <CardContent className="pt-6">

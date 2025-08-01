@@ -54,6 +54,7 @@ export default function NewProductPage() {
       productName: "",
       description: "",
       priceType: "fixed",
+      price: undefined,
       assetType: "",
       keyFeatures: "",
     },
@@ -251,7 +252,7 @@ export default function NewProductPage() {
                         <div className="relative">
                             <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <FormControl>
-                                <Input type="number" placeholder="49.99" className="pl-8" {...field} />
+                                <Input type="number" placeholder="49.99" className="pl-8" {...field} value={field.value ?? ""} />
                             </FormControl>
                         </div>
                         <FormMessage />

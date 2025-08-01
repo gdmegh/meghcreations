@@ -14,8 +14,7 @@ const formSchema = z.object({
   productName: z.string().min(2, {
     message: "Product name must be at least 2 characters.",
   }),
-  keyFeatures: z.string().min(10),
-  targetAudience: z.string().min(5),
+  keyFeatures: z.string().min(3),
 });
 
 interface ProductDescriptionGeneratorProps {
@@ -33,14 +32,14 @@ export function ProductDescriptionGenerator({
   const { toast } = useToast();
 
   const handleGenerateDescription = async () => {
-    const { productName, keyFeatures, targetAudience } =
+    const { productName, keyFeatures } =
       form.getValues();
 
-    if (!productName || !keyFeatures || !targetAudience) {
+    if (!productName || !keyFeatures) {
       toast({
         title: "Missing Information",
         description:
-          "Please fill out Product Name, Key Features, and Target Audience to generate a description.",
+          "Please fill out Product Name and Key Features to generate a description.",
         variant: "destructive",
       });
       return;
@@ -51,7 +50,7 @@ export function ProductDescriptionGenerator({
       const result = await generateDescriptionAction({
         productName,
         keyFeatures,
-        targetAudience,
+        targetAudience: 'Digital creators', // Placeholder as it's required by the flow but removed from UI
       });
       form.setValue("description", result.description, {
         shouldValidate: true,

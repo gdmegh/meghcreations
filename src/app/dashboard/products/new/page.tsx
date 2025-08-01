@@ -39,6 +39,14 @@ const formSchema = z.object({
   previewImage: z
     .any()
     .refine((file) => file instanceof File, "A preview image is required.")
+}).refine(data => {
+    if (data.priceType === 'fixed') {
+        return data.price !== undefined && data.price >= 0;
+    }
+    return true;
+}, {
+    message: "Price is required for a fixed price product.",
+    path: ["price"],
 });
 
 export default function NewProductPage() {
@@ -252,7 +260,7 @@ export default function NewProductPage() {
                         <div className="relative">
                             <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <FormControl>
-                                <Input type="number" placeholder="49.99" className="pl-8" {...field} value={field.value ?? ""} />
+                                <Input type="number" placeholder="49.99" className="pl-8" {...field} value={field.value ?? ""} onChange={e => field.onChange(e.target.value === '' ? undefined : +e.target.value)} />
                             </FormControl>
                         </div>
                         <FormMessage />

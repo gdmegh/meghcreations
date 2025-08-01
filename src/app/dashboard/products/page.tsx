@@ -60,6 +60,12 @@ export default function SellerProductsPage() {
             View, manage, and add new products.
           </p>
         </div>
+        <Button asChild>
+            <Link href="/dashboard/products/new">
+                <PlusCircle className="mr-2 h-4 w-4"/>
+                Add New Product
+            </Link>
+        </Button>
       </div>
       <Card>
         <CardContent className="pt-6">

@@ -19,13 +19,13 @@ async function uploadFileAndGetURL(file: File, path: string): Promise<string> {
 }
 
 
-export async function addProduct(productData: Omit<DigitalAsset, 'id' | 'createdAt' | 'isPublished' | 'previewImageUrl' | 'fileUrl'> & { previewImageFile: File }): Promise<DigitalAsset> {
+export async function addProduct(productData: Omit<DigitalAsset, 'id' | 'createdAt' | 'isPublished' | 'previewImageUrl' | 'fileUrl'> & { previewImage: File }): Promise<DigitalAsset> {
     await simulateNetworkDelay(100);
     
     let previewImageUrl = `https://placehold.co/600x400.png`;
-    if (productData.previewImageFile) {
-        const filePath = `product-images/${productData.creatorId}/${Date.now()}-${productData.previewImageFile.name}`;
-        previewImageUrl = await uploadFileAndGetURL(productData.previewImageFile, filePath);
+    if (productData.previewImage) {
+        const filePath = `product-images/${productData.creatorId}/${Date.now()}-${productData.previewImage.name}`;
+        previewImageUrl = await uploadFileAndGetURL(productData.previewImage, filePath);
     }
 
     const newProductData = {

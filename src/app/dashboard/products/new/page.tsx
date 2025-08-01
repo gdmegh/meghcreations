@@ -96,7 +96,7 @@ export default function NewProductPage() {
         assetType: values.assetType,
         tags: values.keyFeatures.split(',').map(tag => tag.trim()),
         creatorId: user.id,
-        previewImageFile: values.previewImage,
+        previewImage: values.previewImage,
       });
 
       toast({

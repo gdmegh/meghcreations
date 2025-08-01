@@ -5,14 +5,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { onAuthStateChanged, type User } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,10 +20,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { auth } from "@/lib/firebase";
-import { getSellerById, updateUser } from "@/services/data.service";
+import { updateUser } from "@/services/data.service";
 import type { Seller } from "@/lib/constants";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUser } from "@/hooks/use-user";
 
 const formSchema = z.object({
   displayName: z.string().min(2, "Display name is required"),
@@ -35,9 +33,7 @@ const formSchema = z.object({
 
 export default function SellerSettingsPage() {
   const { toast } = useToast();
-  const [user, setUser] = useState<User | null>(null);
-  const [seller, setSeller] = useState<Seller | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, firebaseUser, isLoading: isUserLoading } = useUser();
   const [isSaving, setIsSaving] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -51,26 +47,14 @@ export default function SellerSettingsPage() {
   });
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        // In a real app, you would fetch the user's actual seller profile
-        const currentSeller = await getSellerById(currentUser.uid); 
-        if (currentSeller) {
-          setSeller(currentSeller);
-          form.reset({
-            displayName: currentSeller.displayName,
-            bio: currentSeller.bio || "",
-          });
-          setPreviewImage(currentSeller.profilePictureUrl);
-        }
-      } else {
-        // Redirect or handle non-authenticated user
-      }
-      setIsLoading(false);
-    });
-    return () => unsubscribe();
-  }, [form]);
+    if (user) {
+        form.reset({
+            displayName: user.displayName,
+            bio: user.bio || "",
+        });
+        setPreviewImage(user.profilePictureUrl);
+    }
+  }, [user, form]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -85,14 +69,14 @@ export default function SellerSettingsPage() {
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!user) {
+    if (!firebaseUser) {
       toast({ title: "Not Authenticated", description: "You must be logged in to save settings.", variant: "destructive" });
       return;
     }
     setIsSaving(true);
     
     try {
-      await updateUser(user.uid, {
+      await updateUser(firebaseUser.uid, {
         displayName: values.displayName,
         bio: values.bio,
         profilePictureFile: values.profilePicture,
@@ -102,13 +86,6 @@ export default function SellerSettingsPage() {
         title: "Profile Saved!",
         description: "Your seller profile has been updated.",
       });
-
-      // Refresh the seller data to show new image
-      const updatedSeller = await getSellerById(user.uid);
-      if (updatedSeller) {
-        setSeller(updatedSeller);
-        setPreviewImage(updatedSeller.profilePictureUrl);
-      }
 
     } catch (error) {
       console.error("Failed to update profile", error);
@@ -122,7 +99,7 @@ export default function SellerSettingsPage() {
     }
   }
 
-  if (isLoading) {
+  if (isUserLoading) {
     return (
       <div className="flex justify-center items-center h-full">
         <Loader2 className="animate-spin h-8 w-8" />
@@ -195,7 +172,7 @@ export default function SellerSettingsPage() {
                         <Avatar className="h-20 w-20">
                             <AvatarImage src={previewImage || undefined} alt="Profile Preview" data-ai-hint="person face" />
                             <AvatarFallback className="text-2xl">
-                                {seller?.displayName.charAt(0)}
+                                {user?.displayName.charAt(0)}
                             </AvatarFallback>
                         </Avatar>
                         <FormControl>
@@ -222,5 +199,3 @@ export default function SellerSettingsPage() {
     </div>
   );
 }
-
-    

@@ -23,10 +23,12 @@ export default async function SellerPage({
   return (
     <div className="py-12">
       <Card className="mb-12 overflow-hidden">
-        <div className="bg-muted h-32" />
+        <div className="relative h-48 w-full bg-muted">
+           <Image src="https://placehold.co/1200x300.png" alt="Seller Banner" layout="fill" objectFit="cover" data-ai-hint="abstract background pattern" />
+        </div>
         <CardContent className="p-6 pt-0">
           <div className="flex items-end -mt-16">
-            <Avatar className="w-32 h-32 border-4 border-background">
+            <Avatar className="w-32 h-32 border-4 border-background ring-4 ring-background">
               <AvatarImage src={seller.profilePictureUrl} alt={seller.displayName} data-ai-hint="person face" />
               <AvatarFallback className="text-4xl">{seller.displayName.charAt(0)}</AvatarFallback>
             </Avatar>
